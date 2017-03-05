@@ -1,38 +1,39 @@
-# LaTeX Math (MathJax) with Slack's desktop client
+# Rendered math (MathJax) with Slack's desktop client
 
-[Slack](https://slack.com) does not support math. This shell script injects [MathJax](https://www.mathjax.org) into Slack's desktop client. This allows you to write both inline- and display-style math. You can also edit equations after you've posted them.
+[Slack](https://slack.com) does not display rendered math. This script injects [MathJax](https://www.mathjax.org) into Slack's desktop client, which allows you to write both nice-looking inline- and display-style math. You can also edit equations after you've posted them.
 
 ![Math Slack Example](math-slack.gif "Amazing maths!")
 
 
 ## How do I install it?
 
-The script has only been tested on macOS, but should work on Linux systems as well. (And, with some effort, probably on Windows as well.)
-
-Assuming that Slack is installed at the expected place (i.e., `/Applications/Slack.app`), simply download [math_with_slack.sh](math_with_slack.sh) and run:
+On macOS and Linux systems, simply download and run the script with:
 
 ```shell
+curl -O https://raw.githubusercontent.com/fsavje/math-with-slack/master/math_with_slack.sh && chmod +x math_with_slack.sh
 ./math_with_slack.sh
 ```
 
 After restarting the Slack client, you're all done!
 
-If you've installed Slack at some exotic place, or you're running Linux, you need to specify the location of Slack's `index.js` file as the first parameter. For example:
+If you've installed Slack in some exotic place, you might need to specify its location. For example:
 
 ```shell
-./math_with_slack.sh /Applications/Slack.app/Contents/Resources/app.asar.unpacked/src/static/index.js
+./math_with_slack.sh /My_Applications/Slack.app
 ```
+
+The script does not yet run on Windows.
 
 
 ## How do I get my math rendered?
 
-As with TeX, simply use `$ ... $` for inline math and `$$ ... $$` for display-style math. If you need to write a lot dollar-signs in a message and want to prevent rendering, use backslash to escape them: `\$`. 
+As with TeX, use `$ ... $` for inline math and `$$ ... $$` for display-style math. If you need to write a lot of dollar-signs in a message and want to prevent rendering, use backslash to escape them: `\$`. 
 
-It is worth noting that only users with MathJax injected in their client will see the rendered version of your math. Users with the standard client will see the equations just as you wrote them.
+Note that only users with MathJax injected in their client will see the rendered version of your math. Users with the standard client will see the equations just as you wrote them.
 
 ## How does it work?
 
-The script alters how Slack is loaded. Under the hood, the desktop client is based on ordinary web technology. After startup, the modified client loads the [MathJax library](https://www.mathjax.org) and adds a listener for messages. As soon as it detects a new message, it looks for TeX-styled math and tries to render it. Everything is done completely in the client; messages are *never* sent to any server for rendering.
+The script alters how Slack is loaded. Under the hood, the desktop client is based on ordinary web technology. The modified client loads the [MathJax library](https://www.mathjax.org) after start-up and adds a listener for messages. As soon as it detects a new message, it looks for TeX-styled math and tries to render. Everything is done completely in the client; messages are *never* sent to any server for rendering.
 
 
 ## Can I contribute?

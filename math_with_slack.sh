@@ -1,20 +1,89 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# *** LaTeX Math (MathJax) with Slack's desktop client ***
+################################################################################
+# Rendered math (MathJax) with Slack's desktop client
+################################################################################
 #
-# Slack does not support math. This shell script injects MathJax
-# into Slack's desktop client. This allows you to write both
-# inline- and display-style math. You can also edit equations
-# after you've posted them.
+# Slack (https://slack.com) does not display rendered math. This script injects
+# MathJax (https://www.mathjax.org) into Slack's desktop client, which allows
+# you to write both nice-looking inline- and display-style math. You can also
+# edit equations after you've posted them.
 #
 # https://github.com/fsavje/math-with-slack
 #
-# MIT License
+# MIT License, Copyright 2017 Fredrik Savje
+#
+################################################################################
 
-SLACK_INDEX="$1"
+
+## User input
+
+for p in "$@"; do
+	if [ "$p" = "-f" ]; then
+		FORCE="$p"
+	else
+		SLACK_INDEX="$p"
+	fi
+done
+
+
+## Platform settings
+
+if [ "$(uname)" == "Darwin" ]; then
+	# macOS
+	SHASUM=shasum
+	COMMON_INDEX_LOCATIONS=(
+		"/Applications/Slack.app/Contents/Resources/app.asar.unpacked/src/static/index.js"
+	)
+else
+	# Linux
+	SHASUM=sha1sum
+	COMMON_INDEX_LOCATIONS=(
+		"/usr/lib/slack/resources/app.asar.unpacked/src/static/index.js"
+		"/usr/local/lib/slack/resources/app.asar.unpacked/src/static/index.js"
+		"/opt/slack/resources/app.asar.unpacked/src/static/index.js"
+	)
+	# Repoint from binary to library
+	if [ "$SLACK_INDEX" = "/usr/bin/slack" ]; then
+		SLACK_INDEX="/usr/lib/slack/resources/app.asar.unpacked/src/static/index.js"
+	elif [ "$SLACK_INDEX" = "/usr/local/bin/slack" ]; then
+		SLACK_INDEX="/usr/local/lib/slack/resources/app.asar.unpacked/src/static/index.js"
+	fi
+fi
+
+
+## If the user-provided "index.js" is not found, try to find it
+
+if [ -n "$SLACK_INDEX" ] && [ ! -e "$SLACK_INDEX" ]; then
+	if [ -e "${SLACK_INDEX}Contents/Resources/app.asar.unpacked/src/static/index.js" ]; then
+		SLACK_INDEX="${SLACK_INDEX}Contents/Resources/app.asar.unpacked/src/static/index.js"
+	elif [ -e "$SLACK_INDEX/Contents/Resources/app.asar.unpacked/src/static/index.js" ]; then
+		SLACK_INDEX="$SLACK_INDEX/Contents/Resources/app.asar.unpacked/src/static/index.js"
+	elif [ -e "${SLACK_INDEX}resources/app.asar.unpacked/src/static/index.js" ]; then
+		SLACK_INDEX="${SLACK_INDEX}resources/app.asar.unpacked/src/static/index.js"
+	elif [ -e "$SLACK_INDEX/resources/app.asar.unpacked/src/static/index.js" ]; then
+		SLACK_INDEX="$SLACK_INDEX/resources/app.asar.unpacked/src/static/index.js"
+	fi
+fi
+
+
+## Try to find slack if not provided by user
 
 if [ -z "$SLACK_INDEX" ]; then
-	SLACK_INDEX="/Applications/Slack.app/Contents/Resources/app.asar.unpacked/src/static/index.js"
+	for file in "${COMMON_INDEX_LOCATIONS[@]}"; do
+		if [ -e "$file" ]; then
+			SLACK_INDEX="$file"
+			break
+		fi
+	done
+fi
+
+
+## Check so "index.js" exists and is writable
+
+if [ -z "$SLACK_INDEX" ]; then
+	echo "Cannot find Slack's index file."
+	exit 1
 fi
 
 if [ ! -e "$SLACK_INDEX" ]; then
@@ -27,10 +96,42 @@ if [ ! -w "$SLACK_INDEX" ]; then
 	exit 1
 fi
 
-# Backup
-cp -f $SLACK_INDEX $SLACK_INDEX.bak
 
-# Write code for MathJax injection
+## Does backup exists? If so, do update
+
+if [ -e "$SLACK_INDEX.mwsbak" ]; then
+	cp -f $SLACK_INDEX.mwsbak $SLACK_INDEX
+fi
+
+
+## Check so "index.js" is known to work with the script
+
+KNOWN_INDEX_HASHES=(
+	"f8398ab83df1c69bc39a7a3f0ed4c5594a3d76de"
+)
+INDEX_HASH=$($SHASUM $SLACK_INDEX | cut -c 1-40)
+for hash in "${KNOWN_INDEX_HASHES[@]}"; do
+	if [ "$INDEX_HASH" = "$hash" ]; then
+		INDEX_HASH="ok"
+		break
+	fi
+done
+if [ -z "$FORCE" ] && [ "$INDEX_HASH" != "ok" ]; then
+	echo "Unrecognized index file: $SLACK_INDEX"
+	echo "Call with '-f' flag to suppress this check."
+	exit 1
+fi
+
+
+## Does backup exists? If not, make one
+
+if [ ! -e "$SLACK_INDEX.mwsbak" ]; then
+	cp -f $SLACK_INDEX $SLACK_INDEX.mwsbak
+fi
+
+
+## Write code for MathJax injection
+
 ed -s $SLACK_INDEX <<EOF > /dev/null
 /startup();
 a
@@ -85,3 +186,5 @@ a
 w
 q
 EOF
+
+echo "MathJax successfully injected into Slack. Please restart Slack client."
