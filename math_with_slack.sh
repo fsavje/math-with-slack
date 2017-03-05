@@ -6,8 +6,8 @@
 #
 # Slack (https://slack.com) does not display rendered math. This script injects
 # MathJax (https://www.mathjax.org) into Slack's desktop client, which allows
-# you to write both nice-looking inline- and display-style math. You can also
-# edit equations after you've posted them.
+# you to write nice-looking inline- and display-style math using familiar
+# TeX/LaTeX syntax. You can also edit equations after you've posted them.
 #
 # https://github.com/fsavje/math-with-slack
 #
@@ -35,6 +35,16 @@ if [ "$(uname)" == "Darwin" ]; then
 	COMMON_INDEX_LOCATIONS=(
 		"/Applications/Slack.app/Contents/Resources/app.asar.unpacked/src/static/index.js"
 	)
+
+	## If the user-provided "index.js" is not found, try to find it
+	if [ -n "$SLACK_INDEX" ] && [ ! -e "$SLACK_INDEX" ]; then
+		if [ -e "${SLACK_INDEX}Contents/Resources/app.asar.unpacked/src/static/index.js" ]; then
+			SLACK_INDEX="${SLACK_INDEX}Contents/Resources/app.asar.unpacked/src/static/index.js"
+		elif [ -e "$SLACK_INDEX/Contents/Resources/app.asar.unpacked/src/static/index.js" ]; then
+			SLACK_INDEX="$SLACK_INDEX/Contents/Resources/app.asar.unpacked/src/static/index.js"
+		fi
+	fi
+
 else
 	# Linux
 	SHASUM=sha1sum
@@ -43,27 +53,23 @@ else
 		"/usr/local/lib/slack/resources/app.asar.unpacked/src/static/index.js"
 		"/opt/slack/resources/app.asar.unpacked/src/static/index.js"
 	)
-	# Repoint from binary to library
+
+	## Repoint from binary to library
 	if [ "$SLACK_INDEX" = "/usr/bin/slack" ]; then
 		SLACK_INDEX="/usr/lib/slack/resources/app.asar.unpacked/src/static/index.js"
 	elif [ "$SLACK_INDEX" = "/usr/local/bin/slack" ]; then
 		SLACK_INDEX="/usr/local/lib/slack/resources/app.asar.unpacked/src/static/index.js"
 	fi
-fi
 
-
-## If the user-provided "index.js" is not found, try to find it
-
-if [ -n "$SLACK_INDEX" ] && [ ! -e "$SLACK_INDEX" ]; then
-	if [ -e "${SLACK_INDEX}Contents/Resources/app.asar.unpacked/src/static/index.js" ]; then
-		SLACK_INDEX="${SLACK_INDEX}Contents/Resources/app.asar.unpacked/src/static/index.js"
-	elif [ -e "$SLACK_INDEX/Contents/Resources/app.asar.unpacked/src/static/index.js" ]; then
-		SLACK_INDEX="$SLACK_INDEX/Contents/Resources/app.asar.unpacked/src/static/index.js"
-	elif [ -e "${SLACK_INDEX}resources/app.asar.unpacked/src/static/index.js" ]; then
-		SLACK_INDEX="${SLACK_INDEX}resources/app.asar.unpacked/src/static/index.js"
-	elif [ -e "$SLACK_INDEX/resources/app.asar.unpacked/src/static/index.js" ]; then
-		SLACK_INDEX="$SLACK_INDEX/resources/app.asar.unpacked/src/static/index.js"
+	## If the user-provided "index.js" is not found, try to find it
+	if [ -n "$SLACK_INDEX" ] && [ ! -e "$SLACK_INDEX" ]; then
+		if [ -e "${SLACK_INDEX}resources/app.asar.unpacked/src/static/index.js" ]; then
+			SLACK_INDEX="${SLACK_INDEX}resources/app.asar.unpacked/src/static/index.js"
+		elif [ -e "$SLACK_INDEX/resources/app.asar.unpacked/src/static/index.js" ]; then
+			SLACK_INDEX="$SLACK_INDEX/resources/app.asar.unpacked/src/static/index.js"
+		fi
 	fi
+
 fi
 
 

@@ -1,6 +1,6 @@
 # Rendered math (MathJax) with Slack's desktop client
 
-[Slack](https://slack.com) does not display rendered math. This script injects [MathJax](https://www.mathjax.org) into Slack's desktop client, which allows you to write both nice-looking inline- and display-style math. You can also edit equations after you've posted them.
+[Slack](https://slack.com) does not display rendered math. This script injects [MathJax](https://www.mathjax.org) into Slack's desktop client, which allows you to write nice-looking inline- and display-style math using familiar TeX/LaTeX syntax. You can also edit equations after you've posted them.
 
 ![Math Slack Example](math-slack.gif "Amazing maths!")
 
@@ -10,8 +10,8 @@
 On macOS and Linux systems, simply download and run the script with:
 
 ```shell
-curl -O https://raw.githubusercontent.com/fsavje/math-with-slack/master/math_with_slack.sh && chmod +x math_with_slack.sh
-./math_with_slack.sh
+curl -O https://raw.githubusercontent.com/fsavje/math-with-slack/master/math_with_slack.sh
+sudo bash math_with_slack.sh
 ```
 
 After restarting the Slack client, you're all done!
@@ -19,7 +19,7 @@ After restarting the Slack client, you're all done!
 If you've installed Slack in some exotic place, you might need to specify its location. For example:
 
 ```shell
-./math_with_slack.sh /My_Applications/Slack.app
+sudo bash math_with_slack.sh /My_Applications/Slack.app
 ```
 
 The script does not yet run on Windows.
@@ -29,7 +29,7 @@ The script does not yet run on Windows.
 
 As with TeX, use `$ ... $` for inline math and `$$ ... $$` for display-style math. If you need to write a lot of dollar-signs in a message and want to prevent rendering, use backslash to escape them: `\$`. 
 
-Note that only users with MathJax injected in their client will see the rendered version of your math. Users with the standard client will see the equations just as you wrote them.
+Note that only users with MathJax injected in their client will see the rendered version of your math. Users with the standard client will see the equations just as you wrote them (i.e., unrendered including the dollar signs).
 
 ## How does it work?
 
