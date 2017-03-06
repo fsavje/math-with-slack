@@ -9,40 +9,54 @@
 
 Download your platform's script and run it. After restarting the Slack client, you're all done! (It takes up to 30 seconds for MathJax to load when Slack starts, so be patient.)
 
-If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify Slack's location as a parameter.
 
 ### Mac and Linux
 
-Run the following in the terminal:
+Download and run [this script](https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.sh) by running the following in a terminal:
 
 ```shell
-curl -O https://raw.githubusercontent.com/fsavje/math-with-slack/master/math_with_slack.sh
+curl -O https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.sh
 sudo bash math_with_slack.sh
 ```
 
+
 ### Windows
 
-Download the script and doubleclick on it to run (you will probably get the ordinary security warning from Windows since the file was downloaded from Internet). Alernatively, run the script in the command prompt with:
+[Download this script](https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.bat) and doubleclick on it to run (you'll probably get the ordinary security warning from Windows since the file was downloaded from Internet). Alternatively, run it in the command prompt with:
 
 ```shell
 math_with_slack.bat
 ```
 
 
+### If Slack cannot be found
+
+If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify Slack's location as a parameter. E.g., like this:
+
+```shell
+sudo bash math_with_slack.sh /My_Apps/Slack.app
+```
+
+
 ## How do I get my math rendered?
 
-As with TeX, use `$ ... $` for inline math and `$$ ... $$` for display-style math. If you need to write a lot of dollar-signs in a message and want to prevent rendering, use backslash to escape them: `\$`.
+As you do in TeX, use `$ ... $` for inline math and `$$ ... $$` for display-style math. If you need to write a lot of dollar-signs in a message and want to prevent rendering, use backslash to escape them: `\$`.
 
 Note that only users with MathJax injected in their client will see the rendered version of your math. Users with the standard client will see the equations just as you wrote them (i.e., unrendered including the dollar signs).
 
 ## How does it work?
 
-The script alters how Slack is loaded. Under the hood, the desktop client is based on ordinary web technology. The modified client loads the [MathJax library](https://www.mathjax.org) after start-up and adds a listener for messages. As soon as it detects a new message, it looks for TeX-styled math and tries to render. Everything is done completely in the client; messages are *never* sent to any server for rendering.
+The script alters how Slack is loaded. Under the hood, the desktop client is based on ordinary web technology. The modified client loads the [MathJax library](https://www.mathjax.org) after start-up and adds a listener for messages. As soon as it detects a new message, it looks for TeX-styled math and tries to render. Everything is done in the client; messages are *never* sent to any server for rendering.
 
 
 ## Can I contribute?
 
 Yes, please. Go ahead and file an [issue](https://github.com/fsavje/math-with-slack/issues) or a [pull request](https://github.com/fsavje/math-with-slack/pulls).
+
+### Thanks to past contributors:
+
+* [Caster](https://github.com/Caster)
+* [crstnbr](https://github.com/crstnbr)
 
 
 ## References and inspiration
