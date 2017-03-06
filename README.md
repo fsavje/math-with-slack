@@ -31,10 +31,16 @@ math_with_slack.bat
 
 ### If Slack cannot be found
 
-If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify Slack's location as a parameter. E.g., like this:
+If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify the location of Slack's `index.js` file as a parameter. E.g., like this for Mac and Linux:
 
 ```shell
-sudo bash math_with_slack.sh /My_Apps/Slack.app
+sudo bash math_with_slack.sh /My_Apps/Slack.app/Contents/Resources/app.asar.unpacked/src/static/index.js
+```
+
+and like this on Windows:
+
+```shell
+math_with_slack.bat E:\My_Apps\slack\app-2.5.1\resources\app.asar.unpacked\src\static\index.js
 ```
 
 
