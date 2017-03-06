@@ -7,27 +7,31 @@
 
 ## How do I install it?
 
-On macOS and Linux systems, simply download and run the script with:
+Download your platform's script and run it. After restarting the Slack client, you're all done! (It takes up to 30 seconds for MathJax to load when Slack starts, so be patient.)
+
+If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify Slack's location as a parameter.
+
+### Mac and Linux
+
+Run the following in the terminal:
 
 ```shell
 curl -O https://raw.githubusercontent.com/fsavje/math-with-slack/master/math_with_slack.sh
 sudo bash math_with_slack.sh
 ```
 
-After restarting the Slack client, you're all done!
+### Windows
 
-If you've installed Slack in some exotic place, you might need to specify its location. For example:
+Download the script and doubleclick on it to run (you will probably get the ordinary security warning from Windows since the file was downloaded from Internet). Alernatively, run the script in the command prompt with:
 
 ```shell
-sudo bash math_with_slack.sh /My_Applications/Slack.app
+math_with_slack.bat
 ```
-
-The script does not yet run on Windows.
 
 
 ## How do I get my math rendered?
 
-As with TeX, use `$ ... $` for inline math and `$$ ... $$` for display-style math. If you need to write a lot of dollar-signs in a message and want to prevent rendering, use backslash to escape them: `\$`. 
+As with TeX, use `$ ... $` for inline math and `$$ ... $$` for display-style math. If you need to write a lot of dollar-signs in a message and want to prevent rendering, use backslash to escape them: `\$`.
 
 Note that only users with MathJax injected in their client will see the rendered version of your math. Users with the standard client will see the equations just as you wrote them (i.e., unrendered including the dollar signs).
 

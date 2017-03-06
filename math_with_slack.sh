@@ -112,19 +112,29 @@ fi
 
 ## Check so "index.js" is known to work with the script
 
-KNOWN_INDEX_HASHES=(
-	"f8398ab83df1c69bc39a7a3f0ed4c5594a3d76de"
-)
-INDEX_HASH=$($SHASUM $SLACK_INDEX | cut -c 1-40)
-for hash in "${KNOWN_INDEX_HASHES[@]}"; do
-	if [ "$INDEX_HASH" = "$hash" ]; then
-		INDEX_HASH="ok"
-		break
+if [ -z "$FORCE" ]; then
+	KNOWN_INDEX_HASHES=(
+		"f8398ab83df1c69bc39a7a3f0ed4c5594a3d76de"
+	)
+	INDEX_HASH=$($SHASUM $SLACK_INDEX | cut -c 1-40)
+	for hash in "${KNOWN_INDEX_HASHES[@]}"; do
+		if [ "$INDEX_HASH" = "$hash" ]; then
+			INDEX_HASH="ok"
+			break
+		fi
+	done
+	if [ "$INDEX_HASH" != "ok" ]; then
+		echo "Unrecognized index file: $SLACK_INDEX"
+		echo "Call with '-f' flag to suppress this check."
+		exit 1
 	fi
-done
-if [ -z "$FORCE" ] && [ "$INDEX_HASH" != "ok" ]; then
-	echo "Unrecognized index file: $SLACK_INDEX"
-	echo "Call with '-f' flag to suppress this check."
+fi
+
+
+## Ensure "index.js" contains "startup();"
+
+if ! grep -q "^    startup();$" $SLACK_INDEX; then
+	echo "Cannot find 'startup();' in index file: $SLACK_INDEX"
 	exit 1
 fi
 
@@ -132,7 +142,7 @@ fi
 ## Does backup exists? If not, make one
 
 if [ ! -e "$SLACK_INDEX.mwsbak" ]; then
-	cp -f $SLACK_INDEX $SLACK_INDEX.mwsbak
+	cp $SLACK_INDEX $SLACK_INDEX.mwsbak
 fi
 
 
@@ -184,7 +194,7 @@ a
       for(var i = 0; i < webviews.length; i++) {
         webviews[i].executeJavaScript(mathjax_inject_script);
       }
-    }, 10000);
+    }, 20000);
 
     // *** End injected MathJax
 
