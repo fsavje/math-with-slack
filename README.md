@@ -12,7 +12,7 @@ Download your platform's script and run it. After restarting the Slack client, y
 
 ### Mac and Linux
 
-Download and run [this script](https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.sh) by running the following in a terminal:
+Run the following in a terminal:
 
 ```shell
 curl -O https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.sh
@@ -22,16 +22,23 @@ sudo bash math_with_slack.sh
 
 ### Windows
 
-[Download this script](https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.bat) and doubleclick on it to run (you'll probably get the ordinary security warning from Windows since the file was downloaded from Internet). Alternatively, run it in the command prompt with:
+[Download this script](https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.bat) and doubleclick to run. Alternatively, run it in the command prompt with:
 
 ```shell
 math_with_slack.bat
 ```
 
+ (You'll most likely get a security warning from Windows since the script was downloaded from Internet.)
+
+
+### Updating Slack
+
+When you update the Slack app, it might overwrite the code injected by the script. If the client stops rendering math after an update, re-run the script as above and it should work again.
+
 
 ### If Slack cannot be found
 
-If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify the location of Slack's `index.js` file as a parameter. E.g., like this for Mac and Linux:
+If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify the location of Slack's `index.js` file as a parameter. E.g., like this on Mac and Linux:
 
 ```shell
 sudo bash math_with_slack.sh /My_Apps/Slack.app/Contents/Resources/app.asar.unpacked/src/static/index.js
@@ -50,6 +57,7 @@ As you do in TeX, use `$ ... $` for inline math and `$$ ... $$` for display-styl
 
 Note that only users with MathJax injected in their client will see the rendered version of your math. Users with the standard client will see the equations just as you wrote them (i.e., unrendered including the dollar signs).
 
+
 ## How does it work?
 
 The script alters how Slack is loaded. Under the hood, the desktop client is based on ordinary web technology. The modified client loads the [MathJax library](https://www.mathjax.org) after start-up and adds a listener for messages. As soon as it detects a new message, it looks for TeX-styled math and tries to render. Everything is done in the client; messages are *never* sent to any server for rendering.
@@ -57,14 +65,15 @@ The script alters how Slack is loaded. Under the hood, the desktop client is bas
 
 ## Can I contribute?
 
-Yes, please. Go ahead and file an [issue](https://github.com/fsavje/math-with-slack/issues) or a [pull request](https://github.com/fsavje/math-with-slack/pulls).
+Yes, please. Just add an [issue](https://github.com/fsavje/math-with-slack/issues) or a [pull request](https://github.com/fsavje/math-with-slack/pulls).
 
-### Thanks to past contributors:
+
+**Thanks to past contributors:**
 
 * [Caster](https://github.com/Caster)
 * [crstnbr](https://github.com/crstnbr)
 
 
-## References and inspiration
+**References and inspiration**
 
 This [comment](https://gist.github.com/DrewML/0acd2e389492e7d9d6be63386d75dd99#gistcomment-1981178) by [jouni](https://github.com/jouni) was extremely helpful. So was this [snippet](https://gist.github.com/etihwnad/bc63ec9b87af586e1435) by [etihwnad](https://github.com/etihwnad).
