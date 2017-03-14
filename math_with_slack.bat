@@ -136,7 +136,7 @@ FOR /F "delims=" %%L IN (%SLACK_INDEX%.mwsbak) DO (
 			ECHO.            processEscapes: true
 			ECHO.          },
 			ECHO.          TeX: {
-			ECHO.            extensions: ["noErrors.js", "noUndefined.js"]
+			ECHO.            extensions: ["AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js"]
 			ECHO.          }
 			ECHO.        }^);
 			ECHO.        \`;

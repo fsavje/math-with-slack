@@ -170,7 +170,7 @@ a
             processEscapes: true
           },
           TeX: {
-            extensions: ["noErrors.js", "noUndefined.js"]
+            extensions: ["AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js"]
           }
         });
         \\\`;
