@@ -15,7 +15,7 @@ Download your platform's script and run it. After restarting the Slack client, y
 Run the following in a terminal:
 
 ```shell
-curl -O https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.sh
+curl -OL https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.sh
 sudo bash math_with_slack.sh
 ```
 
