@@ -142,7 +142,7 @@ FOR /F "delims=" %%L IN (%SLACK_INDEX%.mwsbak) DO (
 			ECHO.        \`;
 			ECHO.      var mathjax_script = document.createElement("script"^);
 			ECHO.      mathjax_script.type = "text/javascript";
-			ECHO.      mathjax_script.src = "https://cdn.mathjax.org/mathjax/latest/MathJax.js";
+			ECHO.      mathjax_script.src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js";
 			ECHO.      document.getElementsByTagName("head"^)[0].appendChild(mathjax_config^);
 			ECHO.      document.getElementsByTagName("head"^)[0].appendChild(mathjax_script^);
 			ECHO.
