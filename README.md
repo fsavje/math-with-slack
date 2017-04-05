@@ -1,6 +1,9 @@
 # Rendered math (MathJax) with Slack's desktop client
 
+> :bangbang: MathJax will discontinue its CDN service on April 30. The script has been updated with a new CDN (from Cloudflare). If you downloaded the script before April 5, you will need to download and run the new version.
+
 [Slack](https://slack.com) does not display rendered math. This script injects [MathJax](https://www.mathjax.org) into Slack's desktop client, which allows you to write nice-looking inline- and display-style math using familiar TeX/LaTeX syntax. You can also edit equations after you've posted them.
+
 
 ![Math Slack Example](math-slack.gif "Amazing maths!")
 
