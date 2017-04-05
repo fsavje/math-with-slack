@@ -176,7 +176,7 @@ a
         \\\`;
       var mathjax_script = document.createElement("script");
       mathjax_script.type = "text/javascript";
-      mathjax_script.src = "https://cdn.mathjax.org/mathjax/latest/MathJax.js";
+      mathjax_script.src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js";
       document.getElementsByTagName("head")[0].appendChild(mathjax_config);
       document.getElementsByTagName("head")[0].appendChild(mathjax_script);
 
