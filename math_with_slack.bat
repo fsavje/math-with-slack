@@ -54,6 +54,9 @@ IF "%SLACK_INDEX%" == "" (
 	IF EXIST "%UserProfile%\AppData\Local\slack\app-2.5.1\resources\app.asar.unpacked\src\static\index.js" (
 		SET SLACK_INDEX=%UserProfile%\AppData\Local\slack\app-2.5.1\resources\app.asar.unpacked\src\static\index.js
 	)
+	IF EXIST "%UserProfile%\AppData\Local\slack\app-2.5.2\resources\app.asar.unpacked\src\static\index.js" (
+		SET SLACK_INDEX=%UserProfile%\AppData\Local\slack\app-2.5.2\resources\app.asar.unpacked\src\static\index.js
+	)
 )
 
 
