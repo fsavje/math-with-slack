@@ -51,11 +51,8 @@ IF NOT "%SLACK_INDEX%" == "" IF NOT EXIST "%SLACK_INDEX%" (
 :: Try to find slack if not provided by user
 
 IF "%SLACK_INDEX%" == "" (
-	IF EXIST "%UserProfile%\AppData\Local\slack\app-2.5.1\resources\app.asar.unpacked\src\static\index.js" (
-		SET SLACK_INDEX=%UserProfile%\AppData\Local\slack\app-2.5.1\resources\app.asar.unpacked\src\static\index.js
-	)
-	IF EXIST "%UserProfile%\AppData\Local\slack\app-2.5.2\resources\app.asar.unpacked\src\static\index.js" (
-		SET SLACK_INDEX=%UserProfile%\AppData\Local\slack\app-2.5.2\resources\app.asar.unpacked\src\static\index.js
+	FOR /F %%t IN ('DIR /B /ON %UserProfile%\AppData\Local\slack\app-?.*.*') DO (
+		SET SLACK_INDEX=%UserProfile%\AppData\Local\slack\%%t\resources\app.asar.unpacked\src\static\index.js
 	)
 )
 
