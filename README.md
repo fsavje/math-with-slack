@@ -75,6 +75,7 @@ Yes, please. Just add an [issue](https://github.com/fsavje/math-with-slack/issue
 
 * [Caster](https://github.com/Caster)
 * [crstnbr](https://github.com/crstnbr)
+* [NKudryavka](https://github.com/NKudryavka)
 * [peroxyacyl](https://github.com/peroxyacyl) 
 
 
