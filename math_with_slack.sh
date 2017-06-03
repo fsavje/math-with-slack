@@ -165,6 +165,7 @@ a
           jax: ["input/TeX", "output/HTML-CSS"],
           tex2jax: {
             skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "ql-editor",
             inlineMath: [ ['\$','\$'] ],
             displayMath: [ ['\$\$','\$\$'] ],
             processEscapes: true

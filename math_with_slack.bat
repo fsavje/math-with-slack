@@ -131,6 +131,7 @@ FOR /F "delims=" %%L IN (%SLACK_INDEX%.mwsbak) DO (
 			ECHO.          jax: ["input/TeX", "output/HTML-CSS"],
 			ECHO.          tex2jax: {
 			ECHO.            skipTags: ["script","noscript","style","textarea","pre","code"],
+			ECHO.            ignoreClass: "ql-editor",
 			ECHO.            inlineMath: [ ['\$','\$'] ],
 			ECHO.            displayMath: [ ['\$\$','\$\$'] ],
 			ECHO.            processEscapes: true
