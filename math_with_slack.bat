@@ -82,7 +82,7 @@ IF EXIST "%SLACK_INDEX%.mwsbak" (
 FOR /F "skip=1 delims=" %%L IN ('CertUtil -hashfile %SLACK_INDEX%') DO SET "INDEX_HASH=%%L" & GOTO breakhashloop
 :breakhashloop
 
-IF "%FORCE%" == "" IF NOT "%INDEX_HASH%" == "d4 05 45 4d 96 c6 ac df 4e fa 1d 7c 8a 3a 91 eb 08 69 c3 c8" (
+IF "%FORCE%" == "" IF NOT "%INDEX_HASH%" == "f07fabb32b109500fb264083b8685a85197df522" (
 	ECHO Unrecognized index file: %SLACK_INDEX%
 	ECHO Call with '-f' flag to suppress this check.
 	PAUSE & EXIT /B 1
@@ -91,7 +91,7 @@ IF "%FORCE%" == "" IF NOT "%INDEX_HASH%" == "d4 05 45 4d 96 c6 ac df 4e fa 1d 7c
 
 :: Ensure "index.js" contains "startup();"
 
-FINDSTR /R /C:"^    startup();$" "%SLACK_INDEX%" >NUL
+FINDSTR /R /C:"^    startup();" "%SLACK_INDEX%" >NUL
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO Cannot find 'startup(^);' in index file: %SLACK_INDEX%
 	PAUSE & EXIT /B 1
