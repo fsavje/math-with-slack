@@ -114,7 +114,8 @@ fi
 
 if [ -z "$FORCE" ]; then
 	KNOWN_INDEX_HASHES=(
-		"f8398ab83df1c69bc39a7a3f0ed4c5594a3d76de"
+		"f8398ab83df1c69bc39a7a3f0ed4c5594a3d76de",
+		"f07fabb32b109500fb264083b8685a85197df522"
 	)
 	INDEX_HASH=$($SHASUM $SLACK_INDEX | cut -c 1-40)
 	for hash in "${KNOWN_INDEX_HASHES[@]}"; do
