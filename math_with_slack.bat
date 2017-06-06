@@ -91,7 +91,7 @@ IF "%FORCE%" == "" IF NOT "%INDEX_HASH%" == "f07fabb32b109500fb264083b8685a85197
 
 :: Ensure "index.js" contains "startup();"
 
-FINDSTR /R /C:"    startup();" "%SLACK_INDEX%" >NUL
+FINDSTR /R /C:"^    startup();" "%SLACK_INDEX%" >NUL
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO Cannot find 'startup(^);' in index file: %SLACK_INDEX%
 	PAUSE & EXIT /B 1
@@ -131,6 +131,7 @@ FOR /F "delims=" %%L IN (%SLACK_INDEX%.mwsbak) DO (
 			ECHO.          jax: ["input/TeX", "output/HTML-CSS"],
 			ECHO.          tex2jax: {
 			ECHO.            skipTags: ["script","noscript","style","textarea","pre","code"],
+			ECHO.            ignoreClass: "ql-editor",
 			ECHO.            inlineMath: [ ['\$','\$'] ],
 			ECHO.            displayMath: [ ['\$\$','\$\$'] ],
 			ECHO.            processEscapes: true
