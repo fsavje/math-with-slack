@@ -8,7 +8,7 @@
 
 ## How do I install it?
 
-Download your platform's script and run it. After restarting the Slack client, you're all done! (It takes up to 30 seconds for MathJax to load when Slack starts, so be patient.)
+Download and run your platform's script. Restart the Slack client. You're all done!
 
 
 ### Mac and Linux
@@ -16,20 +16,33 @@ Download your platform's script and run it. After restarting the Slack client, y
 Run the following in a terminal:
 
 ```shell
-curl -OL https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.sh
+curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2/math_with_slack.sh
 sudo bash math_with_slack.sh
 ```
 
 
 ### Windows
 
-[Download this script](https://github.com/fsavje/math-with-slack/releases/download/r/math_with_slack.bat) and doubleclick to run. Alternatively, run it in the command prompt with:
+[Download this script](https://github.com/fsavje/math-with-slack/releases/download/v0.2/math_with_slack.bat) and doubleclick to run. Alternatively, run it in the command prompt with:
 
 ```shell
 math_with_slack.bat
 ```
 
  (You'll most likely get a security warning from Windows since the script was downloaded from Internet.)
+
+
+### Uninstall
+
+To uninstall, run the script again with the `-u` flag:
+
+```shell
+sudo bash math_with_slack.sh -u
+```
+
+```shell
+math_with_slack.bat -u
+```
 
 
 ### Updating Slack
@@ -39,16 +52,14 @@ When you update the Slack app, it might overwrite the code injected by the scrip
 
 ### If Slack cannot be found
 
-If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify the location of Slack's `index.js` file as a parameter. E.g., like this on Mac and Linux:
+If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify the location of Slack's `app.asar.unpacked/src/static` folder as a parameter:
 
 ```shell
-sudo bash math_with_slack.sh /My_Apps/Slack.app/Contents/Resources/app.asar.unpacked/src/static/index.js
+sudo bash math_with_slack.sh /My_Apps/Slack.app/Contents/Resources/app.asar.unpacked/src/static
 ```
 
-and like this on Windows:
-
 ```shell
-math_with_slack.bat E:\My_Apps\slack\app-2.5.1\resources\app.asar.unpacked\src\static\index.js
+math_with_slack.bat E:\My_Apps\slack\app-2.5.1\resources\app.asar.unpacked\src\static
 ```
 
 
@@ -79,6 +90,6 @@ Yes, please. Just add an [issue](https://github.com/fsavje/math-with-slack/issue
 * [peroxyacyl](https://github.com/peroxyacyl) 
 
 
-**References and inspiration**
+**Inspiration**
 
 This [comment](https://gist.github.com/DrewML/0acd2e389492e7d9d6be63386d75dd99#gistcomment-1981178) by [jouni](https://github.com/jouni) was extremely helpful. So was this [snippet](https://gist.github.com/etihwnad/bc63ec9b87af586e1435) by [etihwnad](https://github.com/etihwnad).
