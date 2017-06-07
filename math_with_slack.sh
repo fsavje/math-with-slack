@@ -4,10 +4,10 @@
 # Rendered math (MathJax) with Slack's desktop client
 ################################################################################
 #
-# Slack (https://slack.com) does not display rendered math. This script injects
-# MathJax (https://www.mathjax.org) into Slack's desktop client, which allows
-# you to write nice-looking inline- and display-style math using familiar
-# TeX/LaTeX syntax. You can also edit equations after you've posted them.
+# Slack (https://slack.com) does not display rendered math. This script
+# injects MathJax (https://www.mathjax.org) into Slack's desktop client,
+# which allows you to write nice-looking inline- and display-style math
+# using familiar TeX/LaTeX syntax.
 #
 # https://github.com/fsavje/math-with-slack
 #
@@ -16,13 +16,26 @@
 ################################################################################
 
 
+## Constants
+
+MWS_VERSION="v0.2"
+
+
+## Functions
+
+error() {
+	echo "$(tput setaf 124)$(tput bold)✘ $1$(tput sgr0)"
+	exit 1
+}
+
+
 ## User input
 
 for p in "$@"; do
-	if [ "$p" = "-f" ]; then
-		FORCE="$p"
+	if [ "$p" = "-u" ]; then
+		UNINSTALL="$p"
 	else
-		SLACK_INDEX="$p"
+		SLACK_DIR="$p"
 	fi
 done
 
@@ -31,178 +44,156 @@ done
 
 if [ "$(uname)" == "Darwin" ]; then
 	# macOS
-	SHASUM=shasum
-	COMMON_INDEX_LOCATIONS=(
-		"/Applications/Slack.app/Contents/Resources/app.asar.unpacked/src/static/index.js"
+	COMMON_SLACK_LOCATIONS=(
+		"/Applications/Slack.app/Contents/Resources/app.asar.unpacked/src/static"
 	)
-
-	## If the user-provided "index.js" is not found, try to find it
-	if [ -n "$SLACK_INDEX" ] && [ ! -e "$SLACK_INDEX" ]; then
-		if [ -e "${SLACK_INDEX}Contents/Resources/app.asar.unpacked/src/static/index.js" ]; then
-			SLACK_INDEX="${SLACK_INDEX}Contents/Resources/app.asar.unpacked/src/static/index.js"
-		elif [ -e "$SLACK_INDEX/Contents/Resources/app.asar.unpacked/src/static/index.js" ]; then
-			SLACK_INDEX="$SLACK_INDEX/Contents/Resources/app.asar.unpacked/src/static/index.js"
-		fi
-	fi
-
 else
 	# Linux
-	SHASUM=sha1sum
-	COMMON_INDEX_LOCATIONS=(
-		"/usr/lib/slack/resources/app.asar.unpacked/src/static/index.js"
-		"/usr/local/lib/slack/resources/app.asar.unpacked/src/static/index.js"
-		"/opt/slack/resources/app.asar.unpacked/src/static/index.js"
+	COMMON_SLACK_LOCATIONS=(
+		"/usr/lib/slack/resources/app.asar.unpacked/src/static"
+		"/usr/local/lib/slack/resources/app.asar.unpacked/src/static"
+		"/opt/slack/resources/app.asar.unpacked/src/static"
 	)
-
-	## Repoint from binary to library
-	if [ "$SLACK_INDEX" = "/usr/bin/slack" ]; then
-		SLACK_INDEX="/usr/lib/slack/resources/app.asar.unpacked/src/static/index.js"
-	elif [ "$SLACK_INDEX" = "/usr/local/bin/slack" ]; then
-		SLACK_INDEX="/usr/local/lib/slack/resources/app.asar.unpacked/src/static/index.js"
-	fi
-
-	## If the user-provided "index.js" is not found, try to find it
-	if [ -n "$SLACK_INDEX" ] && [ ! -e "$SLACK_INDEX" ]; then
-		if [ -e "${SLACK_INDEX}resources/app.asar.unpacked/src/static/index.js" ]; then
-			SLACK_INDEX="${SLACK_INDEX}resources/app.asar.unpacked/src/static/index.js"
-		elif [ -e "$SLACK_INDEX/resources/app.asar.unpacked/src/static/index.js" ]; then
-			SLACK_INDEX="$SLACK_INDEX/resources/app.asar.unpacked/src/static/index.js"
-		fi
-	fi
-
 fi
 
 
 ## Try to find slack if not provided by user
 
-if [ -z "$SLACK_INDEX" ]; then
-	for file in "${COMMON_INDEX_LOCATIONS[@]}"; do
-		if [ -e "$file" ]; then
-			SLACK_INDEX="$file"
+if [ -z "$SLACK_DIR" ]; then
+	for loc in "${COMMON_SLACK_LOCATIONS[@]}"; do
+		if [ -e "$loc" ]; then
+			SLACK_DIR="$loc"
 			break
 		fi
 	done
 fi
 
 
-## Check so "index.js" exists and is writable
+## Check so installation exists and is writable
 
-if [ -z "$SLACK_INDEX" ]; then
-	echo "Cannot find Slack's index file."
-	exit 1
-fi
-
-if [ ! -e "$SLACK_INDEX" ]; then
-	echo "Cannot find Slack's index file: $SLACK_INDEX"
-	exit 1
-fi
-
-if [ ! -w "$SLACK_INDEX" ]; then
-	echo "Cannot write to Slack's index file: $SLACK_INDEX"
-	exit 1
+if [ -z "$SLACK_DIR" ]; then
+	error "Cannot find Slack installation."
+elif [ ! -e "$SLACK_DIR" ]; then
+	error "Cannot find Slack installation at: $SLACK_DIR"
+elif [ ! -e "$SLACK_DIR/ssb-interop.js" ]; then
+	error "Cannot find Slack file: $SLACK_DIR/ssb-interop.js"
+elif [ ! -w "$SLACK_DIR/ssb-interop.js" ]; then
+	error "Cannot write to Slack file: $SLACK_DIR/ssb-interop.js"
 fi
 
 
-## Does backup exists? If so, do update
+## Unistall version 0.1
+## (Remove this eventually)
 
-if [ -e "$SLACK_INDEX.mwsbak" ]; then
-	cp -f $SLACK_INDEX.mwsbak $SLACK_INDEX
+if [ -e "$SLACK_DIR/index.js.mwsbak" ]; then
+	mv -f $SLACK_DIR/index.js.mwsbak $SLACK_DIR/index.js
 fi
 
 
-## Check so "index.js" is known to work with the script
+## Remove previous version
 
-if [ -z "$FORCE" ]; then
-	KNOWN_INDEX_HASHES=(
-		"f8398ab83df1c69bc39a7a3f0ed4c5594a3d76de",
-		"f07fabb32b109500fb264083b8685a85197df522"
-	)
-	INDEX_HASH=$($SHASUM $SLACK_INDEX | cut -c 1-40)
-	for hash in "${KNOWN_INDEX_HASHES[@]}"; do
-		if [ "$INDEX_HASH" = "$hash" ]; then
-			INDEX_HASH="ok"
-			break
+if [ -e "$SLACK_DIR/math-with-slack.js" ]; then
+	rm $SLACK_DIR/math-with-slack.js
+fi
+
+
+## Restore previous injections
+
+restore_file() {
+	# Test so file been injected. If not, assume it's more recent than backup
+	if grep -q "math-with-slack" $1; then
+		if [ -e "$1.mwsbak" ]; then
+			mv -f $1.mwsbak $1
+		else
+			error "Cannot restore from backup. Missing file: $1.mwsbak"
 		fi
-	done
-	if [ "$INDEX_HASH" != "ok" ]; then
-		echo "Unrecognized index file: $SLACK_INDEX"
-		echo "Call with '-f' flag to suppress this check."
-		exit 1
+	elif [ -e "$1.mwsbak" ]; then
+		rm $1.mwsbak
 	fi
+}
+
+restore_file $SLACK_DIR/ssb-interop.js
+restore_file $SLACK_DIR/ssb-interop-lite.js
+
+
+## Are we uninstalling?
+
+if [ -n "$UNINSTALL" ]; then
+	echo "$(tput setaf 64)math-with-slack has been $(tput bold)un$(tput sgr0)$(tput setaf 64)installed. Please restart Slack client.$(tput sgr0)"
+	exit 0
 fi
 
 
-## Ensure "index.js" contains "startup();"
+## Write main script
 
-if ! grep -q "^    startup();$" $SLACK_INDEX; then
-	echo "Cannot find 'startup();' in index file: $SLACK_INDEX"
-	exit 1
-fi
+cat <<EOF > $SLACK_DIR/math-with-slack.js
+// math-with-slack $MWS_VERSION
+// https://github.com/fsavje/math-with-slack
 
-
-## Does backup exists? If not, make one
-
-if [ ! -e "$SLACK_INDEX.mwsbak" ]; then
-	cp $SLACK_INDEX $SLACK_INDEX.mwsbak
-fi
-
-
-## Write code for MathJax injection
-
-ed -s $SLACK_INDEX <<EOF > /dev/null
-/startup();
-a
-
-    // *** Code injected for MathJax support
-    // See: https://github.com/fsavje/math-with-slack
-
-    var mathjax_inject_script = \`
-      var mathjax_config = document.createElement("script");
-      mathjax_config.type = "text/x-mathjax-config";
-      mathjax_config.text = \\\`
-        MathJax.Hub.Config({
-          messageStyle: "none",
-          extensions: ["tex2jax.js"],
-          jax: ["input/TeX", "output/HTML-CSS"],
-          tex2jax: {
-            skipTags: ["script","noscript","style","textarea","pre","code"],
-            ignoreClass: "ql-editor",
-            inlineMath: [ ['\$','\$'] ],
-            displayMath: [ ['\$\$','\$\$'] ],
-            processEscapes: true
-          },
-          TeX: {
-            extensions: ["AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js"]
-          }
-        });
-        \\\`;
-      var mathjax_script = document.createElement("script");
-      mathjax_script.type = "text/javascript";
-      mathjax_script.src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js";
-      document.getElementsByTagName("head")[0].appendChild(mathjax_config);
-      document.getElementsByTagName("head")[0].appendChild(mathjax_script);
-
-      var render = function (records, observer) {
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-      };
-      var target = document.querySelector('#msgs_div');
-      var observer = new MutationObserver(render);
-      var config = { attributes: false, childList: true, characterData: true, subtree: true };
-      observer.observe(target, config);
-    \`;
-
-    window.webviews = document.querySelectorAll(".TeamView webview");
-    setTimeout(function() {
-      for(var i = 0; i < webviews.length; i++) {
-        webviews[i].executeJavaScript(mathjax_inject_script);
+document.addEventListener('DOMContentLoaded', function() {
+  var mathjax_config = document.createElement('script');
+  mathjax_config.type = 'text/x-mathjax-config';
+  mathjax_config.text = \`
+    MathJax.Hub.Config({
+      messageStyle: 'none',
+      extensions: ['tex2jax.js'],
+      jax: ['input/TeX', 'output/HTML-CSS'],
+      tex2jax: {
+        displayMath: [['\$\$', '\$\$']],
+        element: 'msgs_div',
+        ignoreClass: 'ql-editor',
+        inlineMath: [['\$', '\$']],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      },
+      TeX: {
+        extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js']
       }
-    }, 20000);
+    });
+  \`;
+  var mathjax_script = document.createElement('script');
+  mathjax_script.type = 'text/javascript';
+  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js';
+  document.head.appendChild(mathjax_config);
+  document.head.appendChild(mathjax_script);
 
-    // *** End injected MathJax
-
-.
-w
-q
+  var target = document.querySelector('#msgs_div');
+  var options = { attributes: false, childList: true, characterData: true, subtree: true };
+  var observer = new MutationObserver(function (r, o) { MathJax.Hub.Queue(['Typeset', MathJax.Hub]); });
+  observer.observe(target, options);
+});
 EOF
 
-echo "MathJax successfully injected into Slack. Please restart Slack client."
+
+## Inject code loader
+
+inject_loader() {
+	# Check so not already injected
+	if grep -q "math-with-slack" $1; then
+		error "File already injected: $1"
+	fi
+
+	# Make backup
+	if [ ! -e "$1.mwsbak" ]; then
+		cp $1 $1.mwsbak
+	else
+		error "Backup already exists: $1.mwsbak"
+	fi
+
+	# Inject loader code
+	cat <<EOF >> $1
+
+// ** math-with-slack $MWS_VERSION ** https://github.com/fsavje/math-with-slack
+var mwsp = path.join(__dirname, 'math-with-slack.js').replace('app.asar', 'app.asar.unpacked');
+require('fs').readFile(mwsp, 'utf8', (e, r) => { if (e) { throw e; } else { eval(r); } });
+EOF
+}
+
+inject_loader $SLACK_DIR/ssb-interop.js
+inject_loader $SLACK_DIR/ssb-interop-lite.js
+
+
+## We're done
+
+echo "$(tput setaf 64)math-with-slack has been installed. Please restart Slack client.$(tput sgr0)"
+
