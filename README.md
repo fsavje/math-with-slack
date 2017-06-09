@@ -1,6 +1,12 @@
 # Rendered math (MathJax) with Slack's desktop client
 
-[Slack](https://slack.com) does not display rendered math. This script injects [MathJax](https://www.mathjax.org) into Slack's desktop client, which allows you to write nice-looking inline- and display-style math using familiar TeX/LaTeX syntax. You can also edit equations after you've posted them.
+[Slack](https://slack.com) does not display rendered math. The `math-with-slack` script allows you to write nice-looking math using familiar TeX syntax by injecting [MathJax](https://www.mathjax.org) into Slack's desktop client. This approach has several advantages over the plugin/bot solution:
+
+  * You can write both inline- and display-style equations.
+  * You can edit equations after you've posted them.
+  * Nothing is sent to external servers for rendering.
+
+The downside is that equations are not rendered for team members without the MathJax injection.
 
 
 ![Math Slack Example](math-slack.gif "Amazing maths!")
@@ -8,7 +14,7 @@
 
 ## How do I install it?
 
-Download and run your platform's script. Restart the Slack client. You're all done!
+Download and run your platform's script. Restart the Slack client. You're done!
 
 
 ### Mac and Linux
@@ -16,20 +22,20 @@ Download and run your platform's script. Restart the Slack client. You're all do
 Run the following in a terminal:
 
 ```shell
-curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2/math_with_slack.sh
+curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2.1/math_with_slack.sh
 sudo bash math_with_slack.sh
 ```
 
 
 ### Windows
 
-[Download this script](https://github.com/fsavje/math-with-slack/releases/download/v0.2/math_with_slack.bat) and doubleclick to run. Alternatively, run it in the command prompt with:
+[Download the script](https://github.com/fsavje/math-with-slack/releases/download/v0.2.1/math_with_slack.bat) and double-click to run. Alternatively, run it in the command prompt with:
 
 ```shell
 math_with_slack.bat
 ```
 
- (You'll most likely get a security warning from Windows since the script was downloaded from Internet.)
+(Windows will probably give you a security warning when running the script since it's downloaded from Internet.)
 
 
 ### Uninstall
@@ -47,12 +53,12 @@ math_with_slack.bat -u
 
 ### Updating Slack
 
-When you update the Slack app, it might overwrite the code injected by the script. If the client stops rendering math after an update, re-run the script as above and it should work again.
+The code injected by the script might be overwritten when you update the Slack app. If your client stops rendering math after an update, re-run the script as above and it should work again.
 
 
 ### If Slack cannot be found
 
-If you've installed Slack in some exotic place, the script might not find the installation by itself and you need to specify the location of Slack's `app.asar.unpacked/src/static` folder as a parameter:
+If you've installed Slack in some exotic place, the script might not find the installation by itself or it might find the wrong installation. In such cases, you need to specify the location of Slack's `app.asar.unpacked/src/static` folder as a parameter:
 
 ```shell
 sudo bash math_with_slack.sh /My_Apps/Slack.app/Contents/Resources/app.asar.unpacked/src/static

@@ -18,7 +18,7 @@
 
 :: Constants
 
-SET "MWS_VERSION=v0.2"
+SET "MWS_VERSION=v0.2.1"
 
 
 :: User input
@@ -44,15 +44,16 @@ IF "%SLACK_DIR%" == "" (
 	FOR /F %%t IN ('DIR /B /OD %UserProfile%\AppData\Local\slack\app-?.*.*') DO (
 		SET SLACK_DIR=%UserProfile%\AppData\Local\slack\%%t\resources\app.asar.unpacked\src\static
 	)
+	IF "%SLACK_DIR%" == "" (
+		ECHO Cannot find Slack installation.
+		PAUSE & EXIT /B 1
+	) ELSE (
+		ECHO Found Slack installation at: %SLACK_DIR%
+	)
 )
 
 
 :: Check so installation exists
-
-IF "%SLACK_DIR%" == "" (
-	ECHO Cannot find Slack installation.
-	PAUSE & EXIT /B 1
-)
 
 IF NOT EXIST "%SLACK_DIR%" (
 	ECHO Cannot find Slack installation at: %SLACK_DIR%

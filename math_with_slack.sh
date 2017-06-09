@@ -18,7 +18,7 @@
 
 ## Constants
 
-MWS_VERSION="v0.2"
+MWS_VERSION="v0.2.1"
 
 
 ## Functions
@@ -66,14 +66,17 @@ if [ -z "$SLACK_DIR" ]; then
 			break
 		fi
 	done
+	if [ -z "$SLACK_DIR" ]; then
+		error "Cannot find Slack installation."
+	else
+		echo "Found Slack installation at: $SLACK_DIR"
+	fi
 fi
 
 
 ## Check so installation exists and is writable
 
-if [ -z "$SLACK_DIR" ]; then
-	error "Cannot find Slack installation."
-elif [ ! -e "$SLACK_DIR" ]; then
+if [ ! -e "$SLACK_DIR" ]; then
 	error "Cannot find Slack installation at: $SLACK_DIR"
 elif [ ! -e "$SLACK_DIR/ssb-interop.js" ]; then
 	error "Cannot find Slack file: $SLACK_DIR/ssb-interop.js"
@@ -119,7 +122,7 @@ restore_file $SLACK_DIR/ssb-interop-lite.js
 ## Are we uninstalling?
 
 if [ -n "$UNINSTALL" ]; then
-	echo "$(tput setaf 64)math-with-slack has been $(tput bold)un$(tput sgr0)$(tput setaf 64)installed. Please restart Slack client.$(tput sgr0)"
+	echo "$(tput setaf 64)math-with-slack has been uninstalled. Please restart Slack client.$(tput sgr0)"
 	exit 0
 fi
 
@@ -181,12 +184,10 @@ inject_loader() {
 	fi
 
 	# Inject loader code
-	cat <<EOF >> $1
-
-// ** math-with-slack $MWS_VERSION ** https://github.com/fsavje/math-with-slack
-var mwsp = path.join(__dirname, 'math-with-slack.js').replace('app.asar', 'app.asar.unpacked');
-require('fs').readFile(mwsp, 'utf8', (e, r) => { if (e) { throw e; } else { eval(r); } });
-EOF
+	echo "" >> $1
+	echo "// ** math-with-slack $MWS_VERSION ** https://github.com/fsavje/math-with-slack" >> $1
+	echo "var mwsp = path.join(__dirname, 'math-with-slack.js').replace('app.asar', 'app.asar.unpacked');" >> $1
+	echo "require('fs').readFile(mwsp, 'utf8', (e, r) => { if (e) { throw e; } else { eval(r); } });" >> $1
 }
 
 inject_loader $SLACK_DIR/ssb-interop.js

@@ -1,3 +1,8 @@
+# math-with-slack 0.2.1
+
+  * Minor fixes.
+
+
 # math-with-slack 0.2
 
   * Loads without delay.
