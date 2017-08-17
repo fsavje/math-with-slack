@@ -1,5 +1,5 @@
 @ECHO OFF
-
+setlocal enabledelayedexpansion enableextensions
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Rendered math (MathJax) with Slack's desktop client
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -44,11 +44,11 @@ IF "%SLACK_DIR%" == "" (
 	FOR /F %%t IN ('DIR /B /OD %UserProfile%\AppData\Local\slack\app-?.*.*') DO (
 		SET SLACK_DIR=%UserProfile%\AppData\Local\slack\%%t\resources\app.asar.unpacked\src\static
 	)
-	IF "%SLACK_DIR%" == "" (
+	IF "!SLACK_DIR!" == "" (
 		ECHO Cannot find Slack installation.
 		PAUSE & EXIT /B 1
 	) ELSE (
-		ECHO Found Slack installation at: %SLACK_DIR%
+		ECHO Found Slack installation at: !SLACK_DIR!
 	)
 )
 
