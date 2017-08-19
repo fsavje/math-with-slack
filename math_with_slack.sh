@@ -18,7 +18,7 @@
 
 ## Constants
 
-MWS_VERSION="v0.2.1"
+MWS_VERSION="v0.2.2"
 
 
 ## Functions
@@ -66,17 +66,14 @@ if [ -z "$SLACK_DIR" ]; then
 			break
 		fi
 	done
-	if [ -z "$SLACK_DIR" ]; then
-		error "Cannot find Slack installation."
-	else
-		echo "Found Slack installation at: $SLACK_DIR"
-	fi
 fi
 
 
 ## Check so installation exists and is writable
 
-if [ ! -e "$SLACK_DIR" ]; then
+if [ -z "$SLACK_DIR" ]; then
+	error "Cannot find Slack installation."
+elif [ ! -e "$SLACK_DIR" ]; then
 	error "Cannot find Slack installation at: $SLACK_DIR"
 elif [ ! -e "$SLACK_DIR/ssb-interop.js" ]; then
 	error "Cannot find Slack file: $SLACK_DIR/ssb-interop.js"
@@ -84,13 +81,7 @@ elif [ ! -w "$SLACK_DIR/ssb-interop.js" ]; then
 	error "Cannot write to Slack file: $SLACK_DIR/ssb-interop.js"
 fi
 
-
-## Unistall version 0.1
-## (Remove this eventually)
-
-if [ -e "$SLACK_DIR/index.js.mwsbak" ]; then
-	mv -f $SLACK_DIR/index.js.mwsbak $SLACK_DIR/index.js
-fi
+echo "Using Slack installation at: $SLACK_DIR"
 
 
 ## Remove previous version
@@ -122,7 +113,7 @@ restore_file $SLACK_DIR/ssb-interop-lite.js
 ## Are we uninstalling?
 
 if [ -n "$UNINSTALL" ]; then
-	echo "$(tput setaf 64)math-with-slack has been uninstalled. Please restart Slack client.$(tput sgr0)"
+	echo "$(tput setaf 64)math-with-slack has been uninstalled. Please restart the Slack client.$(tput sgr0)"
 	exit 0
 fi
 
@@ -196,5 +187,5 @@ inject_loader $SLACK_DIR/ssb-interop-lite.js
 
 ## We're done
 
-echo "$(tput setaf 64)math-with-slack has been installed. Please restart Slack client.$(tput sgr0)"
+echo "$(tput setaf 64)math-with-slack has been installed. Please restart the Slack client.$(tput sgr0)"
 

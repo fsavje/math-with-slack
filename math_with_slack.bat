@@ -18,7 +18,7 @@
 
 :: Constants
 
-SET "MWS_VERSION=v0.2.1"
+SET "MWS_VERSION=v0.2.2"
 
 
 :: User input
@@ -44,16 +44,15 @@ IF "%SLACK_DIR%" == "" (
 	FOR /F %%t IN ('DIR /B /OD %UserProfile%\AppData\Local\slack\app-?.*.*') DO (
 		SET SLACK_DIR=%UserProfile%\AppData\Local\slack\%%t\resources\app.asar.unpacked\src\static
 	)
-	IF "%SLACK_DIR%" == "" (
-		ECHO Cannot find Slack installation.
-		PAUSE & EXIT /B 1
-	) ELSE (
-		ECHO Found Slack installation at: %SLACK_DIR%
-	)
 )
 
 
 :: Check so installation exists
+
+IF "%SLACK_DIR%" == "" (
+	ECHO Cannot find Slack installation.
+	PAUSE & EXIT /B 1
+)
 
 IF NOT EXIST "%SLACK_DIR%" (
 	ECHO Cannot find Slack installation at: %SLACK_DIR%
@@ -66,12 +65,7 @@ IF NOT EXIST "%SLACK_DIR%\ssb-interop.js" (
 )
 
 
-:: Unistall version 0.1
-:: (Remove this eventually)
-
-IF EXIST "%SLACK_DIR%\index.js.mwsbak" (
-	MOVE /Y "%SLACK_DIR%\index.js.mwsbak" "%SLACK_DIR%\index.js" >NUL
-)
+ECHO Using Slack installation at: %SLACK_DIR%
 
 
 :: Remove previous version
@@ -93,7 +87,7 @@ IF %ERRORLEVEL% NEQ 0 ( PAUSE & EXIT /B 1 )
 :: Are we uninstalling?
 
 IF "%UNINSTALL%" == "-u" (
-	ECHO math-with-slack has been uninstalled. Please restart Slack client.
+	ECHO math-with-slack has been uninstalled. Please restart the Slack client.
 	PAUSE & EXIT /B 0
 )
 
@@ -150,7 +144,7 @@ IF %ERRORLEVEL% NEQ 0 ( PAUSE & EXIT /B 1 )
 
 :: We're done
 
-ECHO math-with-slack has been installed. Please restart Slack client.
+ECHO math-with-slack has been installed. Please restart the Slack client.
 PAUSE & EXIT /B 0
 
 
