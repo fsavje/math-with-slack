@@ -98,7 +98,6 @@ restore_file() {
 	# If it doesn't just silently return, to cope with nonexistent
 	# files in different slack-desktop versions.
 	if [ ! -e $1 ]; then
-		echo "File $1 doesn't exist."
 		return 0
 	fi
 
@@ -174,7 +173,6 @@ inject_loader() {
 	# If it doesn't just silently return, to cope with nonexistent
 	# files in different slack-desktop versions.
 	if [ ! -e $1 ]; then
-		echo "File $1 doesn't exist."
 		return 0
 	fi
 
