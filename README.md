@@ -97,7 +97,8 @@ Yes, please. Just add an [issue](https://github.com/fsavje/math-with-slack/issue
 * [jeanluct](https://github.com/jeanluct)
 * [LaurentHayez](https://github.com/LaurentHayez)
 * [NKudryavka](https://github.com/NKudryavka)
-* [peroxyacyl](https://github.com/peroxyacyl) 
+* [peroxyacyl](https://github.com/peroxyacyl)
+* [Spenhouet](https://github.com/Spenhouet)
 
 
 **Inspiration**
