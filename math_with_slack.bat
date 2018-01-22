@@ -11,14 +11,14 @@
 ::
 :: https://github.com/fsavje/math-with-slack
 ::
-:: MIT License, Copyright 2017 Fredrik Savje
+:: MIT License, Copyright 2018 Fredrik Savje
 ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 :: Constants
 
-SET "MWS_VERSION=v0.2.2"
+SET "MWS_VERSION=v0.2.3"
 
 
 :: User input
@@ -80,9 +80,6 @@ IF EXIST "%SLACK_DIR%\math-with-slack.js" (
 CALL :restore_file "%SLACK_DIR%\ssb-interop.js"
 IF %ERRORLEVEL% NEQ 0 ( PAUSE & EXIT /B 1 )
 
-CALL :restore_file "%SLACK_DIR%\ssb-interop-lite.js"
-IF %ERRORLEVEL% NEQ 0 ( PAUSE & EXIT /B 1 )
-
 
 :: Are we uninstalling?
 
@@ -121,11 +118,11 @@ IF "%UNINSTALL%" == "-u" (
 	ECHO.  `;
 	ECHO.  var mathjax_script = document.createElement('script'^);
 	ECHO.  mathjax_script.type = 'text/javascript';
-	ECHO.  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js';
+	ECHO.  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js';
 	ECHO.  document.head.appendChild(mathjax_config^);
 	ECHO.  document.head.appendChild(mathjax_script^);
 	ECHO.
-	ECHO.  var target = document.querySelector('#msgs_div'^);
+	ECHO.  var target = document.querySelector('#messages_container'^);
 	ECHO.  var options = { attributes: false, childList: true, characterData: true, subtree: true };
 	ECHO.  var observer = new MutationObserver(function (r, o^) { MathJax.Hub.Queue(['Typeset', MathJax.Hub]^); }^);
 	ECHO.  observer.observe(target, options^);
@@ -136,9 +133,6 @@ IF "%UNINSTALL%" == "-u" (
 :: Inject code loader
 
 CALL :inject_loader "%SLACK_DIR%\ssb-interop.js"
-IF %ERRORLEVEL% NEQ 0 ( PAUSE & EXIT /B 1 )
-
-CALL :inject_loader "%SLACK_DIR%\ssb-interop-lite.js"
 IF %ERRORLEVEL% NEQ 0 ( PAUSE & EXIT /B 1 )
 
 

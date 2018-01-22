@@ -11,14 +11,14 @@
 #
 # https://github.com/fsavje/math-with-slack
 #
-# MIT License, Copyright 2017 Fredrik Savje
+# MIT License, Copyright 2018 Fredrik Savje
 #
 ################################################################################
 
 
 ## Constants
 
-MWS_VERSION="v0.2.2"
+MWS_VERSION="v0.2.3"
 
 
 ## Functions
@@ -107,7 +107,6 @@ restore_file() {
 }
 
 restore_file $SLACK_DIR/ssb-interop.js
-restore_file $SLACK_DIR/ssb-interop-lite.js
 
 
 ## Are we uninstalling?
@@ -147,11 +146,11 @@ document.addEventListener('DOMContentLoaded', function() {
   \`;
   var mathjax_script = document.createElement('script');
   mathjax_script.type = 'text/javascript';
-  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js';
+  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js';
   document.head.appendChild(mathjax_config);
   document.head.appendChild(mathjax_script);
 
-  var target = document.querySelector('#msgs_div');
+  var target = document.querySelector('#messages_container');
   var options = { attributes: false, childList: true, characterData: true, subtree: true };
   var observer = new MutationObserver(function (r, o) { MathJax.Hub.Queue(['Typeset', MathJax.Hub]); });
   observer.observe(target, options);
@@ -182,7 +181,6 @@ inject_loader() {
 }
 
 inject_loader $SLACK_DIR/ssb-interop.js
-inject_loader $SLACK_DIR/ssb-interop-lite.js
 
 
 ## We're done
