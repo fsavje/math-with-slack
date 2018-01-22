@@ -22,20 +22,26 @@ Download and run your platform's script. Restart the Slack client. You're done!
 Run the following in a terminal:
 
 ```shell
-curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2.2/math_with_slack.sh
-sudo bash math_with_slack.sh
+curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2.3/math-with-slack.sh
+sudo bash math-with-slack.sh
 ```
 
 
 ### Windows
 
-[Download the script](https://github.com/fsavje/math-with-slack/releases/download/v0.2.2/math_with_slack.bat) and double-click to run. Alternatively, run it in the command prompt with:
+[Download the script](https://github.com/fsavje/math-with-slack/releases/download/v0.2.3/math-with-slack.bat) and double-click to run. Alternatively, run it in the command prompt with:
 
 ```shell
-math_with_slack.bat
+math-with-slack.bat
 ```
 
 (Windows will probably give you a security warning when running the script since it's downloaded from Internet.)
+
+The script assumes that you've downloaded the app directly from Slack. If you're using the Windows Store version, it will not find Slack's location. You need to provide the location yourself in that case (see "If Slack cannot be found" below). The app will most likely be installed at `C:\Program Files\WindowsApps\` and the folder might be named something like `A12B23C.Slack_2.9.0.0_x64__A12B23C`. You would then call the script with:
+
+```shell
+math-with-slack.bat "C:\Program Files\WindowsApps\A12B23C.Slack_2.9.0.0_x64__A12B23C\app\resources\app.asar.unpacked\src\static"
+```
 
 
 ### Uninstall
@@ -43,11 +49,11 @@ math_with_slack.bat
 To uninstall, run the script again with the `-u` flag:
 
 ```shell
-sudo bash math_with_slack.sh -u
+sudo bash math-with-slack.sh -u
 ```
 
 ```shell
-math_with_slack.bat -u
+math-with-slack.bat -u
 ```
 
 
@@ -61,11 +67,11 @@ The code injected by the script might be overwritten when you update the Slack a
 If you've installed Slack in some exotic place, the script might not find the installation by itself or it might find the wrong installation. In such cases, you need to specify the location of Slack's `app.asar.unpacked/src/static` folder as a parameter:
 
 ```shell
-sudo bash math_with_slack.sh /My_Apps/Slack.app/Contents/Resources/app.asar.unpacked/src/static
+sudo bash math-with-slack.sh /My_Apps/Slack.app/Contents/Resources/app.asar.unpacked/src/static
 ```
 
 ```shell
-math_with_slack.bat E:\My_Apps\slack\app-2.5.1\resources\app.asar.unpacked\src\static
+math-with-slack.bat E:\My_Apps\slack\app-2.5.1\resources\app.asar.unpacked\src\static
 ```
 
 
@@ -78,7 +84,7 @@ Note that only users with MathJax injected in their client will see the rendered
 
 ## How does it work?
 
-The script alters how Slack is loaded. Under the hood, the desktop client is based on ordinary web technology. The modified client loads the [MathJax library](https://www.mathjax.org) after start-up and adds a listener for messages. As soon as it detects a new message, it looks for TeX-styled math and tries to render. Everything is done in the client; messages are *never* sent to any server for rendering.
+The script alters how Slack is loaded. Under the hood, the desktop client is based on ordinary web technology. The modified client loads the [MathJax library](https://www.mathjax.org) after start-up and adds a listener for messages. As soon as it detects a new message, it looks for TeX-styled math and tries to render. Everything is done in the client. Messages are *never* sent to servers for rendering.
 
 
 ## Can I contribute?
@@ -92,6 +98,8 @@ Yes, please. Just add an [issue](https://github.com/fsavje/math-with-slack/issue
 * [chrispanag](https://github.com/chrispanag)
 * [crstnbr](https://github.com/crstnbr)
 * [gauss256](https://github.com/gauss256)
+* [jeanluct](https://github.com/jeanluct)
+* [LaurentHayez](https://github.com/LaurentHayez)
 * [NKudryavka](https://github.com/NKudryavka)
 * [peroxyacyl](https://github.com/peroxyacyl) 
 
