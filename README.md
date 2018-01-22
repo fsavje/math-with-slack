@@ -37,11 +37,7 @@ math-with-slack.bat
 
 (Windows will probably give you a security warning when running the script since it's downloaded from Internet.)
 
-The script assumes that you've downloaded the app directly from Slack. If you're using the Windows Store version, it will not find Slack's location. You need to provide the location yourself in that case (see "If Slack cannot be found" below). The app will most likely be installed at `C:\Program Files\WindowsApps\` and the folder might be named something like `A12B23C.Slack_2.9.0.0_x64__A12B23C`. You would then call the script with:
-
-```shell
-math-with-slack.bat "C:\Program Files\WindowsApps\A12B23C.Slack_2.9.0.0_x64__A12B23C\app\resources\app.asar.unpacked\src\static"
-```
+The script doesn't work with the Windows Store version of the Slack app. The Windows Store version is write-protected and can't be injected with the MathJax code. The version downloaded from [Slack's website](https://slack.com/downloads/windows) should, however, work.
 
 
 ### Uninstall
