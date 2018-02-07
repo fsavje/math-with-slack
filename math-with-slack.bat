@@ -41,7 +41,7 @@ GOTO parse
 :: Try to find slack if not provided by user
 
 IF "%SLACK_DIR%" == "" (
-	FOR /F %%t IN ('DIR /B /OD %UserProfile%\AppData\Local\slack\app-?.*.*') DO (
+	FOR /F %%t IN ('DIR /B /OD "%UserProfile%\AppData\Local\slack\app-?.*.*"') DO (
 		SET SLACK_DIR=%UserProfile%\AppData\Local\slack\%%t\resources\app.asar.unpacked\src\static
 	)
 )
