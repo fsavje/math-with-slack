@@ -140,13 +140,81 @@ document.addEventListener('DOMContentLoaded', function() {
         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
       },
       TeX: {
-        extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js']
+        extensions: ['AMSmath.js', 'AMSsymbols.js', 'color.js',
+          'AMScd.js', 'noErrors.js', 'noUndefined.js'],
+        Macros: {
+          N: "\\\\\\\\mathbb{N}",
+          Z: "\\\\\\\\mathbb{Z}",
+          Q: "\\\\\\\\mathbb{Q}",
+          R: "\\\\\\\\mathbb{R}",
+          C: "\\\\\\\\mathbb{C}",
+          Var: "\\\\\\\\operatorname{Var}",
+          bb: "\\\\\\\\mathbb",
+          mb: "\\\\\\\\boldsymbol",
+          mc: "\\\\\\\\mathcal",
+          mf: "\\\\\\\\mathfrak",
+          wh: "\\\\\\\\widehat",
+          wt: "\\\\\\\\widetilde",
+          ol: "\\\\\\\\overline",
+          v: "\\\\\\\\mathbf",
+          c: "\\\\\\\\mathcal",
+          tp: "\^{\\\\\\\\mkern+2mu T}",
+          inv: "\^{-1}",
+          eps: "\\\\\\\\epsilon",
+          veps: "\\\\\\\\varepsilon",
+          vphi: "\\\\\\\\varphi",
+          One: "\\\\\\\\mathbf 1",
+          Zero: "\\\\\\\\mathbf 0",
+          indicator: ["\\\\\\\\operatorname{\\\\\\\\mathbb 1}_{#1}",1],
+          ind: ["\\\\\\\\operatorname{\\\\\\\\mathbb 1}_{#1}",1],
+          rank: "\\\\\\\\operatorname{rank}",
+          tr: "\\\\\\\\operatorname{tr}",
+          supp: "\\\\\\\\operatorname{supp}",
+          conv: "\\\\\\\\operatorname{conv}",
+          Bd: "\\\\\\\\operatorname{bd}",
+          Cl: "\\\\\\\\operatorname{cl}",
+          Dom: "\\\\\\\\operatorname{dom}",
+          Epi: "\\\\\\\\operatorname{epi}",
+          Aff: "\\\\\\\\operatorname{aff}",
+          Cone: "\\\\\\\\operatorname{cone}",
+          Int: "\\\\\\\\operatorname{int}",
+          Relint: "\\\\\\\\operatorname{relint}",
+          Span: "\\\\\\\\operatorname{span}",
+          Diam: "\\\\\\\\operatorname{diam}",
+          dist: "\\\\\\\\operatorname{dist}",
+          vect: "\\\\\\\\operatorname{vec}",
+          vol: "\\\\\\\\operatorname{vol}",
+          E: "\\\\\\\\operatorname{\\\\\\\\mathbb E}",
+          P: "\\\\\\\\operatorname{\\\\\\\\mathbb P}",
+          var: "\\\\\\\\operatorname{var}",
+          cov: "\\\\\\\\operatorname{cov}",
+          diag: "\\\\\\\\operatorname{diag}",
+          sign: "\\\\\\\\operatorname{sign}",
+          grad: "\\\\\\\\operatorname{grad}",
+          Hess: "\\\\\\\\operatorname{Hess}",
+          mini: "\\\\\\\\operatorname{minimize}",
+          maxi: "\\\\\\\\operatorname{maximize}",
+          st: "\\\\\\\\operatorname{subject\\\\\\\\; to}",
+          im: "\\\\\\\\mathrm i",
+          iu: "\\\\\\\\hat{\\\\\\\\mathfrak i}",
+          indep:"\\\\\\\\perp\\\\\\\\!\\\\\\\\!\\\\\\\\!\\\\\\\\perp",
+          norm: ["\\\\\\\\left\\\\\\\\lVert #1 \\\\\\\\right\\\\\\\\rVert",1],
+          abs: ["\\\\\\\\left\\\\\\\\lvert #1 \\\\\\\\right\\\\\\\\rvert", 1],
+          innerprod: ["\\\\\\\\left\\\\\\\\langle #1, #2\\\\\\\\right\\\\\\\\rangle", 2],
+          ip: ["\\\\\\\\left\\\\\\\\langle #1, #2\\\\\\\\right\\\\\\\\rangle", 2],
+          prob: ["\\\\\\\\operatorname{\\\\\\\\mathbb{P}}\\\\\\\\left[ #1 \\\\\\\\right]",1],
+          expect: ["\\\\\\\\operatorname{\\\\\\\\mathbb{E}}\\\\\\\\left[ #1 \\\\\\\\right]",1],
+          set: ["\\\\\\\\left\\\\\\\\{ #1 \\\\\\\\right\\\\\\\\}", 1],
+          condset: ["\\\\\\\\left\\\\\\\\{ #1 \\\\\\\\;\\\\\\\\middle|\\\\\\\\; #2 \\\\\\\\right\\\\\\\\}", 2],
+          ceil: ["\\\\\\\\left\\\\\\\\lceil #1 \\\\\\\\right\\\\\\\\rceil",1],
+          floor: ["\\\\\\\\left\\\\\\\\lfloor #1 \\\\\\\\right\\\\\\\\rfloor",1]
+        }
       }
     });
   \`;
   var mathjax_script = document.createElement('script');
   mathjax_script.type = 'text/javascript';
-  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js';
+  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js';
   document.head.appendChild(mathjax_config);
   document.head.appendChild(mathjax_script);
 
