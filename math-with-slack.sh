@@ -141,12 +141,12 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       TeX: {
         extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js']
-      }			  
+      }
     });
   \`;
   var mathjax_script = document.createElement('script');
   mathjax_script.type = 'text/javascript';
-  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js';
+  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js';
   document.head.appendChild(mathjax_config);
   document.head.appendChild(mathjax_script);
 
