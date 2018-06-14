@@ -22,22 +22,25 @@ Download and run your platform's script. Restart the Slack client. You're done!
 Run the following in a terminal:
 
 ```shell
-curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2.3/math-with-slack.sh
+curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2.4/math-with-slack.sh
 sudo bash math-with-slack.sh
 ```
 
 
 ### Windows
 
-[Download the script](https://github.com/fsavje/math-with-slack/releases/download/v0.2.3/math-with-slack.bat) and double-click to run. Alternatively, run it in the command prompt with:
+[Download the script](https://github.com/fsavje/math-with-slack/releases/download/v0.2.4/math-with-slack.bat) and double-click to run. Alternatively, run it in the command prompt with:
 
 ```shell
 math-with-slack.bat
 ```
 
-(Windows will probably give you a security warning when running the script since it's downloaded from Internet.)
+(Windows will probably give you a security warning since the script is downloaded from Internet.)
 
-The script doesn't work with the Windows Store version of the Slack app. The Windows Store version is write-protected and can't be injected with the MathJax code. The version downloaded from [Slack's website](https://slack.com/downloads/windows) should, however, work.
+
+### Package and software managers
+
+The script needs write permissions in the Slack directory in order to inject the MathJax code. Some package and software managers write protect their directories, and `math-with-slack` cannot be installed if Slack is installed through such a manager. This is the case for both the Windows Store and Snap versions of Slack. You should use the version downloaded from [Slack's website](https://slack.com/downloads/windows) if you want to use `math-with-slack`. The script should, however, work with most package managers if you manage to grant the script write permission.
 
 
 ### Uninstall
@@ -99,6 +102,7 @@ Yes, please. Just add an [issue](https://github.com/fsavje/math-with-slack/issue
 * [NKudryavka](https://github.com/NKudryavka)
 * [peroxyacyl](https://github.com/peroxyacyl)
 * [Spenhouet](https://github.com/Spenhouet)
+* [Xyene](https://github.com/Xyene)
 
 
 **Inspiration**

@@ -1,3 +1,9 @@
+# math-with-slack 0.2.4
+
+  * Minor fixes.
+  * Uses MathJax v2.7.4.
+
+
 # math-with-slack 0.2.3
 
   * Minor fixes.

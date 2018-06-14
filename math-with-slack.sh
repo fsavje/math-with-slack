@@ -198,4 +198,3 @@ EOF
 ## We're done
 
 echo "$(tput setaf 64)math-with-slack has been installed. Please restart the Slack client.$(tput sgr0)"
-

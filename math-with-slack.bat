@@ -11,14 +11,14 @@
 ::
 :: https://github.com/fsavje/math-with-slack
 ::
-:: MIT License, Copyright 2018 Fredrik Savje
+:: MIT License, Copyright 2017-2018 Fredrik Savje
 ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 :: Constants
 
-SET "MWS_VERSION=v0.2.3"
+SET "MWS_VERSION=v0.2.4"
 
 
 :: User input
@@ -47,6 +47,12 @@ IF "%SLACK_DIR%" == "" (
 )
 
 
+:: Files
+
+SET "SLACK_MATHJAX_SCRIPT=%SLACK_DIR%/math-with-slack.js"
+SET "SLACK_SSB_INTEROP=%SLACK_DIR%/ssb-interop.js"
+
+
 :: Check so installation exists
 
 IF "%SLACK_DIR%" == "" (
@@ -59,8 +65,8 @@ IF NOT EXIST "%SLACK_DIR%" (
 	PAUSE & EXIT /B 1
 )
 
-IF NOT EXIST "%SLACK_DIR%\ssb-interop.js" (
-	ECHO Cannot find Slack file: %SLACK_DIR%\ssb-interop.js
+IF NOT EXIST "%SLACK_SSB_INTEROP%" (
+	ECHO Cannot find Slack file: %SLACK_SSB_INTEROP%
 	PAUSE & EXIT /B 1
 )
 
@@ -70,15 +76,26 @@ ECHO Using Slack installation at: %SLACK_DIR%
 
 :: Remove previous version
 
-IF EXIST "%SLACK_DIR%\math-with-slack.js" (
-	DEL "%SLACK_DIR%\math-with-slack.js"
+IF EXIST "%SLACK_MATHJAX_SCRIPT%" (
+	DEL "%SLACK_MATHJAX_SCRIPT%"
 )
 
 
 :: Restore previous injections
 
-CALL :restore_file "%SLACK_DIR%\ssb-interop.js"
-IF %ERRORLEVEL% NEQ 0 ( PAUSE & EXIT /B 1 )
+FINDSTR /R /C:"math-with-slack" "%SLACK_SSB_INTEROP%" >NUL
+IF %ERRORLEVEL% EQU 0 (
+	IF EXIST "%SLACK_SSB_INTEROP%.mwsbak" (
+		MOVE /Y "%SLACK_SSB_INTEROP%.mwsbak" "%SLACK_SSB_INTEROP%" >NUL
+	) ELSE (
+		ECHO Cannot restore from backup. Missing file: %SLACK_SSB_INTEROP%.mwsbak
+		PAUSE & EXIT /B 1
+	)
+) ELSE (
+	IF EXIST "%SLACK_SSB_INTEROP%.mwsbak" (
+		DEL "%SLACK_SSB_INTEROP%.mwsbak"
+	)
+)
 
 
 :: Are we uninstalling?
@@ -91,7 +108,7 @@ IF "%UNINSTALL%" == "-u" (
 
 :: Write main script
 
->"%SLACK_DIR%\math-with-slack.js" (
+>"%SLACK_MATHJAX_SCRIPT%" (
 	ECHO.// math-with-slack %MWS_VERSION%
 	ECHO.// https://github.com/fsavje/math-with-slack
 	ECHO.
@@ -116,75 +133,64 @@ IF "%UNINSTALL%" == "-u" (
 	ECHO.      }
 	ECHO.    }^);
 	ECHO.  `;
+	ECHO.
+	ECHO.  var mathjax_observer = document.createElement('script'^);
+	ECHO.  mathjax_observer.type = 'text/x-mathjax-config';
+	ECHO.  mathjax_observer.text = `
+	ECHO.    var target = document.querySelector('#messages_container'^);
+	ECHO.    var options = { attributes: false, childList: true, characterData: true, subtree: true };
+	ECHO.    var observer = new MutationObserver(function (r, o^) { MathJax.Hub.Queue(['Typeset', MathJax.Hub]^); }^);
+	ECHO.    observer.observe(target, options^);
+	ECHO.  `;
+	ECHO.
 	ECHO.  var mathjax_script = document.createElement('script'^);
 	ECHO.  mathjax_script.type = 'text/javascript';
-	ECHO.  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js';
-	ECHO.  document.head.appendChild(mathjax_config^);
-	ECHO.  document.head.appendChild(mathjax_script^);
+	ECHO.  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js';
 	ECHO.
-	ECHO.  var target = document.querySelector('#messages_container'^);
-	ECHO.  var options = { attributes: false, childList: true, characterData: true, subtree: true };
-	ECHO.  var observer = new MutationObserver(function (r, o^) { MathJax.Hub.Queue(['Typeset', MathJax.Hub]^); }^);
-	ECHO.  observer.observe(target, options^);
+	ECHO.  document.head.appendChild(mathjax_config^);
+	ECHO.  document.head.appendChild(mathjax_observer^);
+	ECHO.  document.head.appendChild(mathjax_script^);
 	ECHO.}^);
 )
 
 
-:: Inject code loader
+:: Check so not already injected
 
-CALL :inject_loader "%SLACK_DIR%\ssb-interop.js"
-IF %ERRORLEVEL% NEQ 0 ( PAUSE & EXIT /B 1 )
+FINDSTR /R /C:"math-with-slack" "%SLACK_SSB_INTEROP%" >NUL
+IF %ERRORLEVEL% EQU 0 (
+	ECHO File already injected: %SLACK_SSB_INTEROP%
+	PAUSE & EXIT /B 1
+)
+
+
+:: Make backup
+
+IF NOT EXIST "%SLACK_SSB_INTEROP%.mwsbak" (
+	MOVE /Y "%SLACK_SSB_INTEROP%" "%SLACK_SSB_INTEROP%.mwsbak" >NUL
+) ELSE (
+	ECHO Backup already exists: %SLACK_SSB_INTEROP%.mwsbak
+	PAUSE & EXIT /B 1
+)
+
+
+:: Inject loader code
+
+FOR /F "delims=" %%L IN (%SLACK_SSB_INTEROP%.mwsbak) DO (
+	IF "%%L" == "  init(resourcePath, mainModule, !isDevMode);" (
+		>>"%SLACK_SSB_INTEROP%" (
+			ECHO.  // ** math-with-slack %MWS_VERSION% ** https://github.com/fsavje/math-with-slack
+			ECHO.  var mwsp = path.join(__dirname, 'math-with-slack.js'^).replace('app.asar', 'app.asar.unpacked'^);
+			ECHO.  require('fs'^).readFile(mwsp, 'utf8', (e, r^) =^> { if (e^) { throw e; } else { eval(r^); } }^);
+			ECHO.
+			ECHO.  init(resourcePath, mainModule, !isDevMode^);
+		)
+	) ELSE (
+		>>"%SLACK_SSB_INTEROP%" ECHO.%%L
+	)
+)
 
 
 :: We're done
 
 ECHO math-with-slack has been installed. Please restart the Slack client.
 PAUSE & EXIT /B 0
-
-
-:: Functions
-
-:restore_file
-FINDSTR /R /C:"math-with-slack" "%~1" >NUL
-IF %ERRORLEVEL% EQU 0 (
-	IF EXIST "%~1.mwsbak" (
-		MOVE /Y "%~1.mwsbak" "%~1" >NUL
-	) ELSE (
-		ECHO Cannot restore from backup. Missing file: %~1.mwsbak
-		EXIT /B 1
-	)
-) ELSE (
-	IF EXIST "%~1.mwsbak" (
-		DEL "%~1.mwsbak"
-	)
-)
-EXIT /B 0
-:: end restore_file
-
-
-:inject_loader
-:: Check so not already injected
-FINDSTR /R /C:"math-with-slack" "%~1" >NUL
-IF %ERRORLEVEL% EQU 0 (
-	ECHO File already injected: %~1
-	EXIT /B 1
-)
-
-:: Make backup
-IF NOT EXIST "%~1.mwsbak" (
-	COPY "%~1" "%~1.mwsbak" >NUL
-) ELSE (
-	ECHO Backup already exists: %~1.mwsbak
-	EXIT /B 1
-)
-
-:: Inject loader code
->>"%~1" (
-	ECHO.
-	ECHO.// ** math-with-slack %MWS_VERSION% ** https://github.com/fsavje/math-with-slack
-	ECHO.var mwsp = path.join(__dirname, 'math-with-slack.js'^).replace('app.asar', 'app.asar.unpacked'^);
-	ECHO.require('fs'^).readFile(mwsp, 'utf8', (e, r^) =^> { if (e^) { throw e; } else { eval(r^); } }^);
-)
-
-EXIT /B 0
-:: end inject_loader
