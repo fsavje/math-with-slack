@@ -49,8 +49,8 @@ IF "%SLACK_DIR%" == "" (
 
 :: Files
 
-SET "SLACK_MATHJAX_SCRIPT=%SLACK_DIR%/math-with-slack.js"
-SET "SLACK_SSB_INTEROP=%SLACK_DIR%/ssb-interop.js"
+SET "SLACK_MATHJAX_SCRIPT=%SLACK_DIR%\math-with-slack.js"
+SET "SLACK_SSB_INTEROP=%SLACK_DIR%\ssb-interop.js"
 
 
 :: Check so installation exists
