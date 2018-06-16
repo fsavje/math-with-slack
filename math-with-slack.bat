@@ -18,7 +18,7 @@
 
 :: Constants
 
-SET "MWS_VERSION=v0.2.4"
+SET "MWS_VERSION=v0.2.5"
 
 
 :: User input

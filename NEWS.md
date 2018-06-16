@@ -1,3 +1,8 @@
+# math-with-slack 0.2.5
+
+  * Fixes bug in Windows script.
+
+
 # math-with-slack 0.2.4
 
   * Minor fixes.

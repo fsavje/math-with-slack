@@ -18,7 +18,7 @@
 
 ## Constants
 
-MWS_VERSION="v0.2.4"
+MWS_VERSION="v0.2.5"
 
 
 ## Functions

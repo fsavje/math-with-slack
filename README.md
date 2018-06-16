@@ -22,14 +22,14 @@ Download and run your platform's script. Restart the Slack client. You're done!
 Run the following in a terminal:
 
 ```shell
-curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2.4/math-with-slack.sh
+curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2.5/math-with-slack.sh
 sudo bash math-with-slack.sh
 ```
 
 
 ### Windows
 
-[Download the script](https://github.com/fsavje/math-with-slack/releases/download/v0.2.4/math-with-slack.bat) and double-click to run. Alternatively, run it in the command prompt with:
+[Download the script](https://github.com/fsavje/math-with-slack/releases/download/v0.2.5/math-with-slack.bat) and double-click to run. Alternatively, run it in the command prompt with:
 
 ```shell
 math-with-slack.bat
