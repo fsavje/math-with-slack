@@ -42,7 +42,7 @@ GOTO parse
 
 IF "%SLACK_DIR%" == "" (
 	FOR /F %%t IN ('DIR /B /OD "%UserProfile%\AppData\Local\slack\app-?.*.*"') DO (
-		SET SLACK_DIR=%UserProfile%\AppData\Local\slack\%%t\resources\app.asar.unpacked\src\static
+		SET "SLACK_DIR=%UserProfile%\AppData\Local\slack\%%t\resources\app.asar.unpacked\src\static"
 	)
 )
 
