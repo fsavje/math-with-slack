@@ -40,7 +40,7 @@ math-with-slack.bat
 
 ### Package and software managers
 
-The script needs write permissions in the Slack directory in order to inject the MathJax code. Some package and software managers write protect their directories, and `math-with-slack` cannot be installed if Slack is installed through such a manager. This is the case for both the Windows Store and Snap versions of Slack. You should use the version downloaded from [Slack's website](https://slack.com/downloads/windows) if you want to use `math-with-slack`. The script should, however, work with most package managers if you manage to grant the script write permission.
+The script needs write permissions in the Slack directory in order to inject the MathJax code. Some package and software managers write protect their directories, and `math-with-slack` cannot be installed if Slack is installed through such a manager. This is the case for both the Windows Store and Snap versions of Slack. You should use the version downloaded from [Slack's website](https://slack.com/downloads/windows) if you want to use `math-with-slack`. The script should, however, work with most package managers if [you manage to grant the script write permission](https://github.com/fsavje/math-with-slack/issues/32#issuecomment-479852799).
 
 
 ### Uninstall
