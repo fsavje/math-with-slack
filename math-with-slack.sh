@@ -50,6 +50,7 @@ if [ "$(uname)" == "Darwin" ]; then
 else
 	# Linux
 	COMMON_SLACK_LOCATIONS=(
+	        "/snap/slack/current/usr/lib/slack/resources/app.asar.unpacked/src/static"
 		"/usr/lib/slack/resources/app.asar.unpacked/src/static"
 		"/usr/local/lib/slack/resources/app.asar.unpacked/src/static"
 		"/opt/slack/resources/app.asar.unpacked/src/static"
