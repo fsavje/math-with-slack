@@ -1,4 +1,4 @@
-:warning: :warning: Slack 4 introduces a content security policy to prevent code injections. This breaks the math-with-slack script. No solution exists at the moment. [Suggestions on ways forward are welcome here.](https://github.com/fsavje/math-with-slack/issues/51) :warning: :warning:
+:warning: :warning: Slack 4 introduces a content security policy to prevent code injections. This breaks the math-with-slack script. [A solution is in the making.](https://github.com/fsavje/math-with-slack/issues/51) :warning: :warning:
 
 # Rendered math (MathJax) with Slack's desktop client
 
