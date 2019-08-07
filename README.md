@@ -1,5 +1,3 @@
-:warning: :warning: Slack 4 introduces a content security policy to prevent code injections. This breaks the math-with-slack script. [A solution is in the making.](https://github.com/fsavje/math-with-slack/issues/51) :warning: :warning:
-
 # Rendered math (MathJax) with Slack's desktop client
 
 [Slack](https://slack.com) does not display rendered math. The `math-with-slack` script allows you to write nice-looking math using familiar TeX syntax by injecting [MathJax](https://www.mathjax.org) into Slack's desktop client. This approach has several advantages over the plugin/bot solution:
@@ -16,7 +14,7 @@ The downside is that equations are not rendered for team members without the Mat
 
 ## How do I install it?
 
-Download and run your platform's script. Restart the Slack client. You're done!
+Download and run the script. Restart the Slack client. You're done!
 
 
 ### Mac and Linux
