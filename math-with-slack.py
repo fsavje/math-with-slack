@@ -68,7 +68,11 @@ elif sys.platform == 'linux':
             app_path = test_app_file
             break
 elif sys.platform == 'win32':
-   exprint('Not implemented')
+    import glob
+    app_path = glob.glob(
+        os.path.join(os.environ["UserProfile"],
+                     "AppData\\Local\\slack\\app-?.*.*/resources/app.asar"))[-1]
+    
 
 
 # Check so app.asar file exists
