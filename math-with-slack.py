@@ -205,19 +205,10 @@ document.addEventListener('DOMContentLoaded', function() {
   var mathjax_observer = document.createElement('script');
   mathjax_observer.type = 'text/x-mathjax-config';
   mathjax_observer.text = `
-    var options = { attributes: false, childList: true, characterData: true, subtree: false };
-    var observer = new MutationObserver(
-        function (mutations, observer) {
-            mutations.forEach(function(mutation) {
-                MathJax.Hub.Queue(['Typeset', MathJax.Hub, mutation.target]);
-            });
-        }
-    );
     var entry_observer = new IntersectionObserver(function (entries, observer) {
         entries.forEach(function(entry) {
             if(entry.intersectionRatio > 0) {
                 MathJax.Hub.Queue(['Typeset', MathJax.Hub, entry.target]);
-                observer.observe(msg, options);
             }
         });
         }, 
