@@ -205,10 +205,38 @@ document.addEventListener('DOMContentLoaded', function() {
   var mathjax_observer = document.createElement('script');
   mathjax_observer.type = 'text/x-mathjax-config';
   mathjax_observer.text = `
-    var target = document.querySelector('#messages_container');
-    var options = { attributes: false, childList: true, characterData: true, subtree: true };
-    var observer = new MutationObserver(function (r, o) { MathJax.Hub.Queue(['Typeset', MathJax.Hub]); });
-    observer.observe(target, options);
+    var options = { attributes: false, childList: true, characterData: true, subtree: false };
+    var observer = new MutationObserver(
+        function (mutations, observer) {
+            mutations.forEach(function(mutation) {
+                MathJax.Hub.Queue(['Typeset', MathJax.Hub, mutation.target]);
+            });
+        }
+    );
+    var entry_observer = new IntersectionObserver(function (entries, observer) {
+        entries.forEach(function(entry) {
+            if(entry.intersectionRatio > 0) {
+                MathJax.Hub.Queue(['Typeset', MathJax.Hub, entry.target]);
+                observer.observe(msg, options);
+            }
+        });
+        }, 
+        { root: document.body }
+    );
+    var target = document.body.addEventListener("DOMNodeInserted", 
+        function(event){
+            var target = event.relatedNode;
+            if(target && typeof target.getElementsByClassName === 'function') {
+                // span.c-message_kit__text for messages in the Threads View
+                // span.c-message__body for messages in the chats (i.e. direct messages)
+                var messages = target.querySelectorAll('span.c-message_kit__text, span.c-message__body');
+                for (var i = 0; i < messages.length; i++) {
+                    msg = messages[i];
+                    entry_observer.observe(msg);
+                }
+            }
+        }
+    );
   `;
 
   var mathjax_script = document.createElement('script');
