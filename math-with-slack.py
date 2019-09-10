@@ -181,6 +181,7 @@ if args.uninstall:
 inject_code = ('\n\n// math-with-slack ' + mws_version + '''
 // https://github.com/fsavje/math-with-slack
 document.addEventListener('DOMContentLoaded', function() {
+  localStorage.lastBootSonicValue = "once"; // tricks Slack to not override setting!
   var mathjax_config = document.createElement('script');
   mathjax_config.type = 'text/x-mathjax-config';
   mathjax_config.text = `
