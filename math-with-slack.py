@@ -15,7 +15,7 @@
 #
 ################################################################################
 
-# Python 2.7
+# Python 2.7 and 3
 
 from __future__ import print_function
 
@@ -28,7 +28,14 @@ import os
 import shutil
 import struct
 import sys
-import urllib.request
+
+try:
+    # Python 3
+    import urllib.request as urllib_request
+except:
+    # Python 2
+    import urllib as urllib_request
+
 import tarfile
 import tempfile
 
@@ -275,12 +282,12 @@ def dir_to_json_header(root_dir, initial_offset):
 
 # Download MathJax, currently assumes downloaded file is a tar called package.tar
 
-mathjax_tar_name, headers = urllib.request.urlretrieve(args.mathjax_url)
-mathjax_tmp_dir = tempfile.TemporaryDirectory()
+mathjax_tar_name, headers = urllib_request.urlretrieve(args.mathjax_url)
+mathjax_tmp_dir = tempfile.mkdtemp()
 mathjax_tar = tarfile.open(mathjax_tar_name)
-mathjax_tar.extractall(path=mathjax_tmp_dir.name)
+mathjax_tar.extractall(path=mathjax_tmp_dir)
 mathjax_tar.close()
-mathjax_dir = os.path.join(mathjax_tmp_dir.name, "package")
+mathjax_dir = os.path.join(mathjax_tmp_dir, "package")
 mathjax_json_header, append_file_paths = dir_to_json_header(mathjax_dir, ori_data_size + ori_injected_file_size + len(inject_code))
 json_header["files"]["node_modules"]["files"]["mathjax"] = mathjax_json_header["files"]["."]
 
@@ -316,7 +323,7 @@ with open(app_path + '.mwsbak', mode='rb') as ori_app_fp, \
 
 # We are done
 
-mathjax_tmp_dir.cleanup()
+shutil.rmtree(mathjax_tmp_dir)
 print('Install successful. Please restart Slack.')
 sys.exit(0)
 
