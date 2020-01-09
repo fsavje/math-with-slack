@@ -28,6 +28,9 @@ import os
 import shutil
 import struct
 import sys
+import urllib.request
+import tarfile
+import tempfile
 
 
 # Math with Slack version
@@ -39,7 +42,10 @@ mws_version = '0.3.0.9000'
 
 parser = argparse.ArgumentParser(prog='math-with-slack', description='Inject Slack with MathJax.')
 parser.add_argument('-a', '--app-file', help='Path to Slack\'s \'app.asar\' file.')
-parser.add_argument('-s', '--settings-file', help='Path to Slack\'s \'local-settings.json\' file.')
+# parser.add_argument('-s', '--settings-file', help='Path to Slack\'s \'local-settings.json\' file.')
+parser.add_argument('--mathjax-url', 
+                    help='Url to download mathjax release.', 
+                    default='https://registry.npmjs.org/mathjax/-/mathjax-3.0.0.tgz')
 parser.add_argument('-u', '--uninstall', action='store_true', help='Removes injected MathJax code.')
 parser.add_argument('--version', action='version', version='%(prog)s ' + mws_version)
 args = parser.parse_args()
@@ -82,57 +88,57 @@ except NameError:
 
 # Find path to local-settings.json
 
-if args.settings_file is not None:
-    settings_path = args.settings_file
-elif sys.platform == 'darwin':
-    for test_settings_file in [
-        os.path.expandvars('${HOME}/Library/Application Support/Slack/local-settings.json'),
-        os.path.expandvars('${HOME}/Library/Containers/com.tinyspeck.slackmacgap/Data/Library/Application Support/Slack/local-settings.json')
-    ]:
-        if os.path.isfile(test_settings_file):
-            settings_path = test_settings_file
-            break
-elif sys.platform == 'linux':
-    exprint('Not implemented')
-elif sys.platform == 'win32':
-    settings_path = os.path.expandvars('%AppData%\\Slack\\local-settings.json')
+# if args.settings_file is not None:
+#     settings_path = args.settings_file
+# elif sys.platform == 'darwin':
+#     for test_settings_file in [
+#         os.path.expandvars('${HOME}/Library/Application Support/Slack/local-settings.json'),
+#         os.path.expandvars('${HOME}/Library/Containers/com.tinyspeck.slackmacgap/Data/Library/Application Support/Slack/local-settings.json')
+#     ]:
+#         if os.path.isfile(test_settings_file):
+#             settings_path = test_settings_file
+#             break
+# elif sys.platform == 'linux':
+#     exprint('Not implemented')
+# elif sys.platform == 'win32':
+#     settings_path = os.path.expandvars('%AppData%\\Slack\\local-settings.json')
 
 
 # Check so local-settings.json file exists
 
-try:
-    if not os.path.isfile(settings_path):
-        exprint('Cannot find settings file at: ' + settings_path)
-except NameError:
-    exprint('Could not find local-settings.json. Please provide path.')
+# try:
+#     if not os.path.isfile(settings_path):
+#         exprint('Cannot find settings file at: ' + settings_path)
+# except NameError:
+#     exprint('Could not find local-settings.json. Please provide path.')
 
 
 # Print info
 
 print('Using Slack installation at: ' + app_path)
-print('Using local settings file at: ' + settings_path)
+# print('Using local settings file at: ' + settings_path)
 
 
-# Update local settings file
+# # Update local settings file
 
-with open(settings_path, mode='r') as settings_file:
-    settings_json = json.load(settings_file)
+# with open(settings_path, mode='r') as settings_file:
+#     settings_json = json.load(settings_file)
 
-if args.uninstall:
-    if 'bootSonic.mwsbak' in settings_json:
-        settings_json['bootSonic'] = settings_json['bootSonic.mwsbak']
-        del settings_json['bootSonic.mwsbak']
-else:
-    if 'bootSonic.mwsbak' not in settings_json:
-        settings_json['bootSonic.mwsbak'] = settings_json['bootSonic']
-    settings_json['bootSonic'] = 'never'
+# if args.uninstall:
+#     if 'bootSonic.mwsbak' in settings_json:
+#         settings_json['bootSonic'] = settings_json['bootSonic.mwsbak']
+#         del settings_json['bootSonic.mwsbak']
+# else:
+#     if 'bootSonic.mwsbak' not in settings_json:
+#         settings_json['bootSonic.mwsbak'] = settings_json['bootSonic']
+#     settings_json['bootSonic'] = 'never'
 
-try:
-    with open(settings_path, mode='w') as settings_file:
-        json.dump(settings_json, settings_file, separators=(',', ':'))
-except Exception as e:
-    print(e)
-    exprint('Cannot update settings file. Make sure the script has write permissions.')
+# try:
+#     with open(settings_path, mode='w') as settings_file:
+#         json.dump(settings_json, settings_file, separators=(',', ':'))
+# except Exception as e:
+#     print(e)
+#     exprint('Cannot update settings file. Make sure the script has write permissions.')
 
 
 # Remove previously injected code if it exists
@@ -179,65 +185,58 @@ if args.uninstall:
 # Code to be injected
 
 inject_code = ('\n\n// math-with-slack ' + mws_version + '''
-// https://github.com/fsavje/math-with-slack
+// Inject MathJax 3.
+// Credit to initial implementation: https://github.com/fsavje/math-with-slack
 document.addEventListener('DOMContentLoaded', function() {
-  localStorage.lastBootSonicValue = "once"; // tricks Slack to not override setting!
-  var mathjax_config = document.createElement('script');
-  mathjax_config.type = 'text/x-mathjax-config';
-  mathjax_config.text = `
-    MathJax.Hub.Config({
-      messageStyle: 'none',
-      extensions: ['tex2jax.js'],
-      jax: ['input/TeX', 'output/HTML-CSS'],
-      tex2jax: {
-        displayMath: [['$$', '$$']],
-        element: 'msgs_div',
-        ignoreClass: 'ql-editor',
-        inlineMath: [['$', '$']],
-        processEscapes: true,
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      },
-      TeX: {
-        extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js']
-      }
-    });
-  `;
 
-  var mathjax_observer = document.createElement('script');
-  mathjax_observer.type = 'text/x-mathjax-config';
-  mathjax_observer.text = `
-    var entry_observer = new IntersectionObserver(function (entries, observer) {
-        entries.forEach(function(entry) {
-            if(entry.intersectionRatio > 0) {
-                MathJax.Hub.Queue(['Typeset', MathJax.Hub, entry.target]);
-            }
-        });
-        }, 
-        { root: document.body }
-    );
-    var target = document.body.addEventListener("DOMNodeInserted", 
-        function(event){
-            var target = event.relatedNode;
-            if(target && typeof target.getElementsByClassName === 'function') {
-                // span.c-message_kit__text for messages in the Threads View
-                // span.c-message__body for messages in the chats (i.e. direct messages)
-                var messages = target.querySelectorAll('span.c-message_kit__text, span.c-message__body');
-                for (var i = 0; i < messages.length; i++) {
-                    msg = messages[i];
-                    entry_observer.observe(msg);
+  function typeset(element) {
+    const MathJax = window.MathJax;
+    MathJax.startup.promise = MathJax.startup.promise
+      .then(() => {return MathJax.typesetPromise(element);})
+      .catch((err) => console.log('Typeset failed: ' + err.message));
+    return MathJax.startup.promise;
+  }
+
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$']],
+      displayMath: [['$$', '$$']],
+      // the following doesn't seem to work with MathJax 3
+      // skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    startup: {
+      ready: () => {
+        MathJax = window.MathJax;
+        MathJax.startup.defaultReady();
+        var entry_observer = new IntersectionObserver(
+          (entries, observer) => {
+            var appearedEntries = entries.filter((entry) => entry.intersectionRatio > 0);
+            console.log(appearedEntries);
+            typeset(appearedEntries.map((entry) => entry.target));
+          }, 
+          { root: document.body }
+        );
+        var target = document.body.addEventListener("DOMNodeInserted", 
+            function(event) {
+                var target = event.relatedNode;
+                if(target && typeof target.getElementsByClassName === 'function') {
+                    // span.c-message_kit__text for messages in the Threads View
+                    // span.c-message__body for messages in the chats (i.e. direct messages)
+                    var messages = target.querySelectorAll('span.c-message__body, span.c-message_kit__text, div.p-rich_text_block');
+                    for (var i = 0; i < messages.length; i++) {
+                        msg = messages[i];
+                        entry_observer.observe(msg);
+                    }
                 }
             }
-        }
-    );
-  `;
+        );
+      }
+    },
+  };
 
-  var mathjax_script = document.createElement('script');
-  mathjax_script.type = 'text/javascript';
-  mathjax_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js';
+  // Import mathjax
+  require("mathjax/es5/tex-svg-full");
 
-  document.head.appendChild(mathjax_config);
-  document.head.appendChild(mathjax_observer);
-  document.head.appendChild(mathjax_script);
 });
 ''').encode('utf-8')
 
@@ -265,16 +264,65 @@ with open(app_path + '.mwsbak', mode='rb') as ori_app_fp:
 assert json_binary_size == json_data_size + 4
 json_header = json.loads(json_binary[8:(json_string_size + 8)].decode('utf-8'))
 assert 'MWSINJECT' not in json_header['files']
-ori_ssbinterop_size = json_header['files']['dist']['files']['ssb-interop.bundle.js']['size']
-ori_ssbinterop_offset = int(json_header['files']['dist']['files']['ssb-interop.bundle.js']['offset'])
+
+
+injected_file_name = 'main-preload-entry-point.bundle.js'
+ori_injected_file_size = json_header['files']['dist']['files'][injected_file_name]['size']
+ori_injected_file_offset = int(json_header['files']['dist']['files'][injected_file_name]['offset'])
 
 
 # Modify JSON data
 
 json_header['files']['MWSINJECT'] = json_header['files']['LICENSE']
-json_header['files']['dist']['files']['ssb-interop.bundle.js']['size'] = ori_ssbinterop_size + len(inject_code)
-json_header['files']['dist']['files']['ssb-interop.bundle.js']['offset'] = str(ori_data_size)
+json_header['files']['dist']['files'][injected_file_name]['size'] = ori_injected_file_size + len(inject_code)
+json_header['files']['dist']['files'][injected_file_name]['offset'] = str(ori_data_size)
 
+def split_path_to_components(path):
+    dirs = []
+    while True:
+        path, dir = os.path.split(path)
+        if dir != "":
+            dirs.append(dir)
+        else:
+            if path != "":
+                dirs.append(dir)
+            break
+    dirs.reverse()
+    if dirs == ['.']:
+        return dirs
+    else:
+        return ['.'] + dirs
+
+def dir_to_json_header(root_dir, initial_offset):
+    file_paths = []
+    result = {"files": {}}
+    offset = initial_offset
+    for parent_abs, dirs, files in os.walk(root_dir):
+        parent = os.path.relpath(parent_abs, root_dir)
+        parent_components = split_path_to_components(parent)
+        rdict = result
+        for dir_component in parent_components[:-1]:
+            rdict = rdict["files"][dir_component]
+        rdict["files"][parent_components[-1]] = {"files": {}}
+        for file in files:
+            file_path = os.path.join(parent_abs, file)
+            file_paths.append(file_path)
+            size = os.path.getsize(file_path)
+            rdict["files"][parent_components[-1]]["files"][file] = {'size': size, 'offset': str(offset)}
+            offset += size
+    return result, file_paths
+
+# Download MathJax, currently assumes downloaded file is a tar called package.tar
+
+mathjax_tar_name, headers = urllib.request.urlretrieve(args.mathjax_url)
+mathjax_tmp_dir = tempfile.TemporaryDirectory()
+mathjax_tar = tarfile.open(mathjax_tar_name)
+mathjax_tar.extractall(path=mathjax_tmp_dir.name)
+mathjax_tar.close()
+mathjax_dir = os.path.join(mathjax_tmp_dir.name, "package")
+mathjax_json_header, append_file_paths = dir_to_json_header(mathjax_dir, ori_data_size + ori_injected_file_size + len(inject_code))
+json_header["files"]["node_modules"]["files"]["mathjax"] = mathjax_json_header["files"]["."]
+import pdb; pdb.set_trace()
 
 # Write new app.asar file
 
@@ -293,16 +341,21 @@ with open(app_path + '.mwsbak', mode='rb') as ori_app_fp, \
     # Old data
     ori_app_fp.seek(ori_data_offset)
     shutil.copyfileobj(ori_app_fp, new_app_fp)
-    # Modified ssb-interop.bundle.js
-    ori_app_fp.seek(ori_data_offset + ori_ssbinterop_offset)
-    copy_until = ori_app_fp.tell() + ori_ssbinterop_size
+    # Modified injected_file
+    ori_app_fp.seek(ori_data_offset + ori_injected_file_offset)
+    copy_until = ori_app_fp.tell() + ori_injected_file_size
     while ori_app_fp.tell() < copy_until:
         new_app_fp.write(ori_app_fp.read(min(65536, copy_until - ori_app_fp.tell())))
     new_app_fp.write(inject_code)
-
+    # Append files in sequence
+    new_app_fp.seek(0, 2)
+    for append_file_path in append_file_paths:
+        with open(append_file_path, 'rb') as append_file:
+            new_app_fp.write(append_file.read())
 
 # We are done
 
+mathjax_tmp_dir.cleanup()
 print('Install successful. Please restart Slack.')
 sys.exit(0)
 
