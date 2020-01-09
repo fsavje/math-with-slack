@@ -42,7 +42,6 @@ mws_version = '0.3.0.9000'
 
 parser = argparse.ArgumentParser(prog='math-with-slack', description='Inject Slack with MathJax.')
 parser.add_argument('-a', '--app-file', help='Path to Slack\'s \'app.asar\' file.')
-# parser.add_argument('-s', '--settings-file', help='Path to Slack\'s \'local-settings.json\' file.')
 parser.add_argument('--mathjax-url', 
                     help='Url to download mathjax release.', 
                     default='https://registry.npmjs.org/mathjax/-/mathjax-3.0.0.tgz')
@@ -86,59 +85,10 @@ except NameError:
     exprint('Could not find Slack\'s app.asar file. Please provide path.')
 
 
-# Find path to local-settings.json
-
-# if args.settings_file is not None:
-#     settings_path = args.settings_file
-# elif sys.platform == 'darwin':
-#     for test_settings_file in [
-#         os.path.expandvars('${HOME}/Library/Application Support/Slack/local-settings.json'),
-#         os.path.expandvars('${HOME}/Library/Containers/com.tinyspeck.slackmacgap/Data/Library/Application Support/Slack/local-settings.json')
-#     ]:
-#         if os.path.isfile(test_settings_file):
-#             settings_path = test_settings_file
-#             break
-# elif sys.platform == 'linux':
-#     exprint('Not implemented')
-# elif sys.platform == 'win32':
-#     settings_path = os.path.expandvars('%AppData%\\Slack\\local-settings.json')
-
-
-# Check so local-settings.json file exists
-
-# try:
-#     if not os.path.isfile(settings_path):
-#         exprint('Cannot find settings file at: ' + settings_path)
-# except NameError:
-#     exprint('Could not find local-settings.json. Please provide path.')
-
 
 # Print info
 
 print('Using Slack installation at: ' + app_path)
-# print('Using local settings file at: ' + settings_path)
-
-
-# # Update local settings file
-
-# with open(settings_path, mode='r') as settings_file:
-#     settings_json = json.load(settings_file)
-
-# if args.uninstall:
-#     if 'bootSonic.mwsbak' in settings_json:
-#         settings_json['bootSonic'] = settings_json['bootSonic.mwsbak']
-#         del settings_json['bootSonic.mwsbak']
-# else:
-#     if 'bootSonic.mwsbak' not in settings_json:
-#         settings_json['bootSonic.mwsbak'] = settings_json['bootSonic']
-#     settings_json['bootSonic'] = 'never'
-
-# try:
-#     with open(settings_path, mode='w') as settings_file:
-#         json.dump(settings_json, settings_file, separators=(',', ':'))
-# except Exception as e:
-#     print(e)
-#     exprint('Cannot update settings file. Make sure the script has write permissions.')
 
 
 # Remove previously injected code if it exists
@@ -294,6 +244,17 @@ def split_path_to_components(path):
         return ['.'] + dirs
 
 def dir_to_json_header(root_dir, initial_offset):
+    """Returns the json header for `root_dir`.
+    
+    Args:
+        - root_dir: the root_dir 
+        - initial_offset: a number that is added to all offset of files
+
+    Returns:
+        a tuple of (result, file_paths), where result is a dict containing
+        the json header, and file_paths is a list of file paths in order 
+        that should be appended to the end of the .asar file. 
+    """
     file_paths = []
     result = {"files": {}}
     offset = initial_offset
@@ -322,7 +283,7 @@ mathjax_tar.close()
 mathjax_dir = os.path.join(mathjax_tmp_dir.name, "package")
 mathjax_json_header, append_file_paths = dir_to_json_header(mathjax_dir, ori_data_size + ori_injected_file_size + len(inject_code))
 json_header["files"]["node_modules"]["files"]["mathjax"] = mathjax_json_header["files"]["."]
-import pdb; pdb.set_trace()
+
 
 # Write new app.asar file
 
@@ -347,7 +308,7 @@ with open(app_path + '.mwsbak', mode='rb') as ori_app_fp, \
     while ori_app_fp.tell() < copy_until:
         new_app_fp.write(ori_app_fp.read(min(65536, copy_until - ori_app_fp.tell())))
     new_app_fp.write(inject_code)
-    # Append files in sequence
+    # Append MathJax files in sequence
     new_app_fp.seek(0, 2)
     for append_file_path in append_file_paths:
         with open(append_file_path, 'rb') as append_file:
