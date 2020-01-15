@@ -70,7 +70,7 @@ if args.app_file is not None:
     app_path = args.app_file
 elif sys.platform == 'darwin':
     app_path = '/Applications/Slack.app/Contents/Resources/app.asar'
-elif sys.platform == 'linux':
+elif sys.platform.startswith('linux'):
     for test_app_file in [
         '/usr/lib/slack/resources/app.asar',
         '/usr/local/lib/slack/resources/app.asar',
@@ -155,7 +155,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   window.MathJax = {
+    loader: {load: ['[tex]/ams', '[tex]/color', '[tex]/noerrors', '[tex]/noundefined', '[tex]/boldsymbol']},
     tex: {
+      packages: {'[+]': ['ams', 'color', 'noerrors', 'noundefined', 'boldsymbol']},
       inlineMath: [['$', '$']],
       displayMath: [['$$', '$$']],
       // the following doesn't seem to work with MathJax 3
