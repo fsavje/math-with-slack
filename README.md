@@ -14,20 +14,22 @@ The downside is that equations are not rendered for team members without the Mat
 
 ## How do I install it?
 
-Download and run the script. Restart the Slack client. You're done!
+Get and run the script. Restart the Slack client. You're done!
 
+### Getting the script
 
 ### Mac and Linux
 
 Run the following in a terminal:
 
 ```shell
-curl -OL https://github.com/fsavje/math-with-slack/releases/download/v0.2.5/math-with-slack.sh
-sudo bash math-with-slack.sh
+curl -OL https://raw.githubusercontent.com/psg-mit/math-with-slack/v3/math-with-slack.py
+sudo python math-with-slack.py
 ```
 
-
 ### Windows
+
+!!! Current support for windows is unknown
 
 [Download the script](https://github.com/fsavje/math-with-slack/releases/download/v0.2.5/math-with-slack.bat) and double-click to run. Alternatively, run it in the command prompt with:
 
