@@ -28,6 +28,7 @@ import os
 import shutil
 import struct
 import sys
+import packaging.version
 
 try:
     # Python 3
@@ -109,12 +110,14 @@ with open(app_path, mode='rb') as check_app_fp:
 assert json_binary_size == json_data_size + 4
 json_check = json.loads(json_binary[8:(json_string_size + 8)].decode('utf-8'))
 
+app_backup_path = app_path + '.mwsbak'
+
 if 'MWSINJECT' in json_check['files']:
-    if not os.path.isfile(app_path + '.mwsbak'):
+    if not os.path.isfile(app_backup_path):
         exprint('Found injected code without backup. Please re-install Slack.')
     try:
         os.remove(app_path)
-        shutil.move(app_path + '.mwsbak', app_path)
+        shutil.move(app_backup_path, app_path)
     except Exception as e:
         print(e)
         exprint('Cannot remove previously injected code. Make sure the script has write permissions.')
@@ -122,9 +125,9 @@ if 'MWSINJECT' in json_check['files']:
 
 # Remove old backup if it exists
 
-if os.path.isfile(app_path + '.mwsbak'):
+if os.path.isfile(app_backup_path):
     try:
-        os.remove(app_path + '.mwsbak')
+        os.remove(app_backup_path)
     except Exception as e:
         print(e)
         exprint('Cannot remove old backup. Make sure the script has write permissions.')
@@ -203,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
 # Make backup
 
 try:
-    shutil.move(app_path, app_path + '.mwsbak')
+    shutil.copy(app_path, app_backup_path)
 except Exception as e:
     print(e)
     exprint('Cannot make backup. Make sure the script has write permissions.')
@@ -211,7 +214,7 @@ except Exception as e:
 
 # Get file info
 
-with open(app_path + '.mwsbak', mode='rb') as ori_app_fp:
+with open(app_backup_path, mode='rb') as ori_app_fp:
     (header_data_size, json_binary_size) = struct.unpack('<II', ori_app_fp.read(8))
     assert header_data_size == 4
     json_binary = ori_app_fp.read(json_binary_size)
@@ -224,8 +227,31 @@ assert json_binary_size == json_data_size + 4
 json_header = json.loads(json_binary[8:(json_string_size + 8)].decode('utf-8'))
 assert 'MWSINJECT' not in json_header['files']
 
+def read_file_from_asar(file_offset, file_size):
+    with open(app_backup_path, mode='rb') as ori_app_fp:
+        ori_app_fp.seek(file_offset + ori_data_offset)
+        binary = ori_app_fp.read(file_size)
+        return binary
 
-injected_file_name = 'main-preload-entry-point.bundle.js'
+def read_package_json():
+    package_json_desp = json_header['files']['package.json']
+    binary = read_file_from_asar(int(package_json_desp['offset']), int(package_json_desp['size']))
+    return json.loads(binary)
+
+def read_slack_version():
+    package_json = read_package_json()
+    return packaging.version.parse(package_json['version'])
+
+slack_version = read_slack_version()
+
+if slack_version == packaging.version.parse('4.3.3'):
+    injected_file_name = 'main-preload-entry-point.bundle.js'
+elif slack_version == packaging.version.parse('4.4.1'):
+    injected_file_name = 'preload.bundle.js'
+else:
+    exprint("Unsupported Slack Version {}.".format(slack_version))
+
+
 ori_injected_file_size = json_header['files']['dist']['files'][injected_file_name]['size']
 ori_injected_file_offset = int(json_header['files']['dist']['files'][injected_file_name]['offset'])
 
@@ -299,7 +325,7 @@ json_header["files"]["node_modules"]["files"]["mathjax"] = mathjax_json_header["
 new_json_header = json.dumps(json_header, separators=(',', ':')).encode('utf-8')
 new_json_header_padding = (4 - len(new_json_header) % 4) % 4
 
-with open(app_path + '.mwsbak', mode='rb') as ori_app_fp, \
+with open(app_backup_path, mode='rb') as ori_app_fp, \
      open(app_path, mode='wb') as new_app_fp:
     # Header
     new_app_fp.write(struct.pack('<I', 4))
