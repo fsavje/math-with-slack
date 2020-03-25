@@ -152,13 +152,24 @@ document.addEventListener('DOMContentLoaded', function() {
   function typeset(element) {
     const MathJax = window.MathJax;
     MathJax.startup.promise = MathJax.startup.promise
-      .then(() => {return MathJax.typesetPromise(element);})
+      .then(() => {console.log(element); return MathJax.typesetPromise(element);})
       .catch((err) => console.log('Typeset failed: ' + err.message));
     return MathJax.startup.promise;
   }
 
   window.MathJax = {
-    loader: {load: ['[tex]/ams', '[tex]/color', '[tex]/noerrors', '[tex]/noundefined', '[tex]/boldsymbol']},
+    loader: {
+        paths: {mathjax: 'mathjax/es5'},
+        source: {},
+        require: require,
+        load: [
+            'input/tex-full',
+            'output/svg',
+            '[tex]/noerrors', 
+            '[tex]/noundefined', 
+            '[tex]/boldsymbol'
+        ]
+    },
     tex: {
       packages: {'[+]': ['ams', 'color', 'noerrors', 'noundefined', 'boldsymbol']},
       inlineMath: [['$', '$']],
@@ -173,8 +184,10 @@ document.addEventListener('DOMContentLoaded', function() {
         var entry_observer = new IntersectionObserver(
           (entries, observer) => {
             var appearedEntries = entries.filter((entry) => entry.intersectionRatio > 0);
-            console.log(appearedEntries);
-            typeset(appearedEntries.map((entry) => entry.target));
+            if(appearedEntries.length) {
+                console.log(appearedEntries);
+                typeset(appearedEntries.map((entry) => entry.target));
+            }
           }, 
           { root: document.body }
         );
@@ -197,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Import mathjax
-  require("mathjax/es5/tex-svg-full");
+  require("mathjax/es5/startup.js");
 
 });
 ''').encode('utf-8')
