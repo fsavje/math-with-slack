@@ -28,7 +28,7 @@ import os
 import shutil
 import struct
 import sys
-from distutils.version import StrictVersion
+from distutils.version import LooseVersion
 
 try:
     # Python 3
@@ -240,13 +240,13 @@ def read_package_json():
 
 def read_slack_version():
     package_json = read_package_json()
-    return StrictVersion(package_json['version'])
+    return LooseVersion(package_json['version'])
 
 slack_version = read_slack_version()
 
-if slack_version == StrictVersion('4.3.3'):
+if LooseVersion('4.3') <= slack_version < LooseVersion('4.4'):
     injected_file_name = 'main-preload-entry-point.bundle.js'
-elif slack_version == StrictVersion('4.4.1'):
+elif LooseVersion('4.4') <= slack_version:
     injected_file_name = 'preload.bundle.js'
 else:
     exprint("Unsupported Slack Version {}.".format(slack_version))
