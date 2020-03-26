@@ -52,7 +52,7 @@ parser = argparse.ArgumentParser(prog='math-with-slack', description='Inject Sla
 parser.add_argument('-a', '--app-file', help='Path to Slack\'s \'app.asar\' file.')
 parser.add_argument('--mathjax-url', 
                     help='Url to download mathjax release.', 
-                    default='https://registry.npmjs.org/mathjax/-/mathjax-3.0.0.tgz')
+                    default='https://registry.npmjs.org/mathjax/-/mathjax-3.0.1.tgz')
 parser.add_argument('-u', '--uninstall', action='store_true', help='Removes injected MathJax code.')
 parser.add_argument('--version', action='version', version='%(prog)s ' + mws_version)
 args = parser.parse_args()
@@ -158,6 +158,12 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   window.MathJax = {
+    options: {
+        skipHtmlTags: [
+            'script', 'noscript', 'style', 'textarea', 'pre',
+            'code', 'annotation', 'annotation-xml'
+        ],
+    },
     loader: {
         paths: {mathjax: 'mathjax/es5'},
         source: {},
@@ -174,8 +180,6 @@ document.addEventListener('DOMContentLoaded', function() {
       packages: {'[+]': ['ams', 'color', 'noerrors', 'noundefined', 'boldsymbol']},
       inlineMath: [['$', '$']],
       displayMath: [['$$', '$$']],
-      // the following doesn't seem to work with MathJax 3
-      // skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
     },
     startup: {
       ready: () => {
