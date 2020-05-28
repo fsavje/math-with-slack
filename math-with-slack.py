@@ -214,8 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Import mathjax
-  require("mathjax/es5/startup.js");
-
+  $MATH_JAX_STUB$
 });
 ''').encode('utf-8')
 
@@ -263,21 +262,14 @@ slack_version = read_slack_version()
 
 if LooseVersion('4.3') <= slack_version < LooseVersion('4.4'):
     injected_file_name = 'main-preload-entry-point.bundle.js'
-elif LooseVersion('4.4') <= slack_version:
+elif LooseVersion('4.4') <= slack_version < LooseVersion('4.6'):
     injected_file_name = 'preload.bundle.js'
+    include_mathjax_inline = False
+elif LooseVersion('4.6') <= slack_version:
+    injected_file_name = 'preload.bundle.js'
+    include_mathjax_inline = True
 else:
     exprint("Unsupported Slack Version {}.".format(slack_version))
-
-
-ori_injected_file_size = json_header['files']['dist']['files'][injected_file_name]['size']
-ori_injected_file_offset = int(json_header['files']['dist']['files'][injected_file_name]['offset'])
-
-
-# Modify JSON data
-
-json_header['files']['MWSINJECT'] = json_header['files']['LICENSE']
-json_header['files']['dist']['files'][injected_file_name]['size'] = ori_injected_file_size + len(inject_code)
-json_header['files']['dist']['files'][injected_file_name]['offset'] = str(ori_data_size)
 
 def split_path_to_components(path):
     dirs = []
@@ -333,9 +325,28 @@ mathjax_tar = tarfile.open(mathjax_tar_name)
 mathjax_tar.extractall(path=mathjax_tmp_dir)
 mathjax_tar.close()
 mathjax_dir = os.path.join(mathjax_tmp_dir, "package")
-mathjax_json_header, append_file_paths = dir_to_json_header(mathjax_dir, ori_data_size + ori_injected_file_size + len(inject_code))
-json_header["files"]["node_modules"]["files"]["mathjax"] = mathjax_json_header["files"]["."]
+if include_mathjax_inline:
+    mathjax_src_path = os.path.join(mathjax_dir, "es5/tex-svg-full.js")
+    with open(mathjax_src_path, "r+") as mathjax_src_file:
+        mathjax_src = mathjax_src_file.read().encode('utf-8')
+    append_file_paths = []
+else:
+    mathjax_json_header, append_file_paths = dir_to_json_header(mathjax_dir, ori_data_size + ori_injected_file_size + len(inject_code))
+    json_header["files"]["node_modules"]["files"]["mathjax"] = mathjax_json_header["files"]["."]
+    mathjax_src = "require('mathjax/es5/startup.js');"
 
+inject_code = inject_code.replace(b"$MATH_JAX_STUB$", mathjax_src)
+
+
+ori_injected_file_size = json_header['files']['dist']['files'][injected_file_name]['size']
+ori_injected_file_offset = int(json_header['files']['dist']['files'][injected_file_name]['offset'])
+
+
+# Modify JSON data
+
+json_header['files']['MWSINJECT'] = json_header['files']['LICENSE']
+json_header['files']['dist']['files'][injected_file_name]['size'] = ori_injected_file_size + len(inject_code)
+json_header['files']['dist']['files'][injected_file_name]['offset'] = str(ori_data_size)
 
 # Write new app.asar file
 
