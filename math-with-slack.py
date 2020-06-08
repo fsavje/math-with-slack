@@ -318,6 +318,10 @@ def dir_to_json_header(root_dir, initial_offset):
             offset += size
     return result, file_paths
 
+
+ori_injected_file_size = json_header['files']['dist']['files'][injected_file_name]['size']
+ori_injected_file_offset = int(json_header['files']['dist']['files'][injected_file_name]['offset'])
+
 # Download MathJax, currently assumes downloaded file is a tar called package.tar
 
 mathjax_tar_name, headers = urllib_request.urlretrieve(args.mathjax_url)
@@ -337,11 +341,6 @@ else:
     mathjax_src = "require('mathjax/es5/startup.js');"
 
 inject_code = inject_code.replace(b"$MATH_JAX_STUB$", mathjax_src)
-
-
-ori_injected_file_size = json_header['files']['dist']['files'][injected_file_name]['size']
-ori_injected_file_offset = int(json_header['files']['dist']['files'][injected_file_name]['offset'])
-
 
 # Modify JSON data
 
