@@ -263,12 +263,9 @@ slack_version = read_slack_version()
 if LooseVersion('4.3') <= slack_version < LooseVersion('4.4'):
     injected_file_name = 'main-preload-entry-point.bundle.js'
     include_mathjax_inline = False
-elif LooseVersion('4.4') <= slack_version < LooseVersion('4.6'):
+elif LooseVersion('4.4') <= slack_version:
     injected_file_name = 'preload.bundle.js'
-    include_mathjax_inline = False
-elif LooseVersion('4.6') <= slack_version:
-    injected_file_name = 'preload.bundle.js'
-    include_mathjax_inline = True
+    include_mathjax_inline = True # We always use include mathjax inline now
 else:
     exprint("Unsupported Slack Version {}.".format(slack_version))
 
