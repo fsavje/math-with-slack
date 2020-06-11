@@ -23,7 +23,7 @@ Get and run the script. Restart the Slack client. You're done!
 Run the following in a terminal:
 
 ```shell
-curl -OL https://raw.githubusercontent.com/psg-mit/math-with-slack/v3/math-with-slack.py
+curl -OL https://raw.githubusercontent.com/psg-mit/math-with-slack/master/math-with-slack.py
 sudo python math-with-slack.py
 ```
 
