@@ -30,6 +30,7 @@ sudo python math-with-slack.py
 
 ### Windows
 
+
 You need to exit your Slack before the installation. Then there are two ways to install `math-with-slack` on Windows.
 
    1. Ubuntu subsystem
@@ -50,6 +51,10 @@ You need to exit your Slack before the installation. Then there are two ways to 
       ```
       
    If multiple versions of Slack are found on your computer, you will be asked to select one from them.
+   
+   **Currently, we only support Slack installed from [Slack installer](https://slack.com/downloads/windows).
+   If your Slack is installed through Microsoft Store, `math-with-slack` is not able to modifiy files in `WindowsApps`
+   folder hence not able to embedded our script.**
 
 
 ### Package and software managers
