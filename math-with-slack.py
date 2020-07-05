@@ -25,6 +25,7 @@ from __future__ import print_function
 import argparse
 import json
 import os
+import glob
 import shutil
 import struct
 import sys
@@ -36,6 +37,10 @@ try:
 except:
     # Python 2
     import urllib as urllib_request
+# ssl is added for Windows and possibly Mac to avoid ssl
+# certificate_verify_failed error
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 import tarfile
 import tempfile
@@ -75,13 +80,38 @@ elif sys.platform.startswith('linux'):
     for test_app_file in [
         '/usr/lib/slack/resources/app.asar',
         '/usr/local/lib/slack/resources/app.asar',
-        '/opt/slack/resources/app.asar'
+        '/opt/slack/resources/app.asar',
     ]:
         if os.path.isfile(test_app_file):
             app_path = test_app_file
             break
+    test_app_files = glob.glob(
+            '/mnt/c/Users/*/AppData/Local/slack/*/resources/app.asar')
+    if len(test_app_files) == 1:
+        app_path = test_app_files[0]
+    else:
+        for test_app_file in test_app_files:
+            tmp_ans = input(
+                    'Install to path: '+test_app_file+' (Yes/No/Stop)')
+            if tmp_ans.lower() == 'yes' or tmp_ans.lower() == 'y':
+                app_path = test_app_file
+                break
+            elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
+                exit()
 elif sys.platform == 'win32':
-   exprint('Not implemented')
+    test_app_files = glob.glob(
+            'c:/Users/*/AppData/Local/slack/*/resources/app.asar')
+    if len(test_app_files) == 1:
+        app_path = test_app_files[0]
+    else:
+        for test_app_file in test_app_files:
+            tmp_ans = input(
+                    'Install to path: '+test_app_file+' (Yes/No/Stop)')
+            if tmp_ans.lower() == 'yes' or tmp_ans.lower() == 'y':
+                app_path = test_app_file
+                break
+            elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
+                exit()
 
 
 # Check so app.asar file exists
