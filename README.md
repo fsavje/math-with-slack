@@ -95,6 +95,7 @@ of versions that we have tested and the corresponding URLs.
 
 Some URLs works better for certain areas. You can use any URL in the
 table to install `math-with-latex`.
+
    ```shell
    cd path\to\math-with-slack
    python math-with-slack.py --mathjax-url=https://r.cnpmjs.org/mathjax/-/mathjax-3.0.5.tgz
@@ -168,6 +169,7 @@ Yes, please. Just add an [issue](https://github.com/fsavje/math-with-slack/issue
 * [Spenhouet](https://github.com/Spenhouet)
 * [Xyene](https://github.com/Xyene)
 * [thisiscam](https://github.com/thisiscam)
+* [YingzhouLi](https://github.com/YingzhouLi)
 
 **Inspiration**
 
