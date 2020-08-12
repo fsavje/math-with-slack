@@ -90,28 +90,36 @@ elif sys.platform.startswith('linux'):
     if len(test_app_files) == 1:
         app_path = test_app_files[0]
     else:
-        for test_app_file in test_app_files:
-            tmp_ans = input(
-                    'Install to path: '+test_app_file+' (Yes/No/Stop)')
-            if tmp_ans.lower() == 'yes' or tmp_ans.lower() == 'y':
-                app_path = test_app_file
-                break
-            elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
-                exit()
+        test_app_files.reverse()
+        print('Several verisons of Slack were installed.')
+        for idx, test_app_file in enumerate(test_app_files):
+            print('%2d: %s' % (idx, test_app_file))
+        tmp_ans = input('Please select a version (#/Stop): ')
+        if tmp_ans.lower() == '' or tmp_ans.lower() == 'yes' \
+                or tmp_ans.lower() == 'y':
+            app_path = test_app_files[0]
+        elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
+            exit()
+        else:
+            app_path = test_app_files[int(tmp_ans)]
 elif sys.platform == 'win32':
     test_app_files = glob.glob(
             'c:/Users/*/AppData/Local/slack/*/resources/app.asar')
     if len(test_app_files) == 1:
         app_path = test_app_files[0]
     else:
-        for test_app_file in test_app_files:
-            tmp_ans = input(
-                    'Install to path: '+test_app_file+' (Yes/No/Stop)')
-            if tmp_ans.lower() == 'yes' or tmp_ans.lower() == 'y':
-                app_path = test_app_file
-                break
-            elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
-                exit()
+        test_app_files.reverse()
+        print('Several verisons of Slack were installed.')
+        for idx, test_app_file in enumerate(test_app_files):
+            print('%2d: %s' % (idx, test_app_file))
+        tmp_ans = input('Please select a version (#/Stop): ')
+        if tmp_ans.lower() == '' or tmp_ans.lower() == 'yes' \
+                or tmp_ans.lower() == 'y':
+            app_path = test_app_files[0]
+        elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
+            exit()
+        else:
+            app_path = test_app_files[int(tmp_ans)]
 
 
 # Check so app.asar file exists
