@@ -25,9 +25,11 @@ from __future__ import print_function
 import argparse
 import json
 import os
+import glob
 import shutil
 import struct
 import sys
+import time
 from distutils.version import LooseVersion
 
 try:
@@ -36,6 +38,10 @@ try:
 except:
     # Python 2
     import urllib as urllib_request
+# ssl is added for Windows and possibly Mac to avoid ssl
+# certificate_verify_failed error
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 import tarfile
 import tempfile
@@ -43,7 +49,7 @@ import tempfile
 
 # Math with Slack version
 
-mws_version = '0.3.0.9000'
+mws_version = '0.4.0.0000'
 
 
 # Parse command line options
@@ -52,7 +58,7 @@ parser = argparse.ArgumentParser(prog='math-with-slack', description='Inject Sla
 parser.add_argument('-a', '--app-file', help='Path to Slack\'s \'app.asar\' file.')
 parser.add_argument('--mathjax-url', 
                     help='Url to download mathjax release.', 
-                    default='https://registry.npmjs.org/mathjax/-/mathjax-3.0.1.tgz')
+                    default='https://registry.npmjs.org/mathjax/-/mathjax-3.0.5.tgz')
 parser.add_argument('-u', '--uninstall', action='store_true', help='Removes injected MathJax code.')
 parser.add_argument('--version', action='version', version='%(prog)s ' + mws_version)
 args = parser.parse_args()
@@ -75,13 +81,46 @@ elif sys.platform.startswith('linux'):
     for test_app_file in [
         '/usr/lib/slack/resources/app.asar',
         '/usr/local/lib/slack/resources/app.asar',
-        '/opt/slack/resources/app.asar'
+        '/opt/slack/resources/app.asar',
     ]:
         if os.path.isfile(test_app_file):
             app_path = test_app_file
             break
+    test_app_files = glob.glob(
+            '/mnt/c/Users/*/AppData/Local/slack/*/resources/app.asar')
+    if len(test_app_files) == 1:
+        app_path = test_app_files[0]
+    else:
+        test_app_files.reverse()
+        print('Several verisons of Slack were installed.')
+        for idx, test_app_file in enumerate(test_app_files):
+            print('%2d: %s' % (idx, test_app_file))
+        tmp_ans = input('Please select a version (#/Stop): ')
+        if tmp_ans.lower() == '' or tmp_ans.lower() == 'yes' \
+                or tmp_ans.lower() == 'y':
+            app_path = test_app_files[0]
+        elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
+            exit()
+        else:
+            app_path = test_app_files[int(tmp_ans)]
 elif sys.platform == 'win32':
-   exprint('Not implemented')
+    test_app_files = glob.glob(
+            'c:/Users/*/AppData/Local/slack/*/resources/app.asar')
+    if len(test_app_files) == 1:
+        app_path = test_app_files[0]
+    else:
+        test_app_files.reverse()
+        print('Several verisons of Slack were installed.')
+        for idx, test_app_file in enumerate(test_app_files):
+            print('%2d: %s' % (idx, test_app_file))
+        tmp_ans = input('Please select a version (#/Stop): ')
+        if tmp_ans.lower() == '' or tmp_ans.lower() == 'yes' \
+                or tmp_ans.lower() == 'y':
+            app_path = test_app_files[0]
+        elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
+            exit()
+        else:
+            app_path = test_app_files[int(tmp_ans)]
 
 
 # Check so app.asar file exists
@@ -320,8 +359,28 @@ ori_injected_file_size = json_header['files']['dist']['files'][injected_file_nam
 ori_injected_file_offset = int(json_header['files']['dist']['files'][injected_file_name]['offset'])
 
 # Download MathJax, currently assumes downloaded file is a tar called package.tar
+def reporthook(count, block_size, total_size):
+    global start_time
+    global progress_size
+    if count == 0:
+        progress_size = 0
+        start_time = time.time()
+        return
+    duration = time.time() - start_time
+    progress_size += block_size
+    if progress_size >= total_size:
+        progress_size = total_size
+    speed = progress_size / (1024 * duration)
+    percent = int(progress_size * 100 / total_size)
+    sys.stdout.write("\rDownloading MathJax...%3d%%, %3.1f MB / %3.1f MB, %6.1f KB/s, %d sec"
+        % (percent, progress_size / (1024 * 1024),
+            total_size/1024/1024, speed, duration))
+    if progress_size >= total_size:
+        sys.stdout.write("\n")
+    sys.stdout.flush()
 
-mathjax_tar_name, headers = urllib_request.urlretrieve(args.mathjax_url)
+mathjax_tar_name, headers = urllib_request.urlretrieve(args.mathjax_url,
+        [], reporthook)
 mathjax_tmp_dir = tempfile.mkdtemp()
 mathjax_tar = tarfile.open(mathjax_tar_name)
 mathjax_tar.extractall(path=mathjax_tmp_dir)
