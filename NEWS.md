@@ -1,3 +1,17 @@
+# math-with-slack 0.4.0
+
+  * Changed default MathJax to v3.0.5
+  * Added support for Slack on Windows
+  * Added support for selection among multiple Slack versions
+
+# math-with-slack 0.3.0
+
+  * Inline MathJax v3.0.1
+
+# math-with-slack 0.2.5
+
+  * Fixes bug in Windows script.
+
 # math-with-slack 0.2.5
 
   * Fixes bug in Windows script.

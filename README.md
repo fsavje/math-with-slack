@@ -78,6 +78,29 @@ You should use the version downloaded from [Slack's website](https://slack.com/d
 [you manage to grant the script write permission](https://github.com/fsavje/math-with-slack/issues/32#issuecomment-479852799).
 
 
+### MathJax versions and URLs
+
+The default MathJax is of version 3.0.5 and downloaded from `https://registry.npmjs.org/mathjax/-/mathjax-3.0.5.tgz`, which is a registry of npmjs. 
+
+The script also works with other versions of MathJax 3 and we list a table
+of versions that we have tested and the corresponding URLs.
+
+| Version | URLs                                                                                                         | File Size |
+|---------|--------------------------------------------------------------------------------------------------------------|-----------|
+| 3.0.5   | https://registry.npmjs.org/mathjax/-/mathjax-3.0.5.tgz <br> https://r.cnpmjs.org/mathjax/-/mathjax-3.0.5.tgz | 4.4 MB    |
+| 3.0.4   | https://registry.npmjs.org/mathjax/-/mathjax-3.0.4.tgz <br> https://r.cnpmjs.org/mathjax/-/mathjax-3.0.4.tgz | 4.4 MB    |
+| 3.0.1   | https://registry.npmjs.org/mathjax/-/mathjax-3.0.1.tgz <br> https://r.cnpmjs.org/mathjax/-/mathjax-3.0.1.tgz | 6.3 MB    |
+| 3.0.0   | https://registry.npmjs.org/mathjax/-/mathjax-3.0.0.tgz <br> https://r.cnpmjs.org/mathjax/-/mathjax-3.0.0.tgz | 6.3 MB    |
+
+
+Some URLs works better for certain areas. You can use any URL in the
+table to install `math-with-latex`.
+   ```shell
+   cd path\to\math-with-slack
+   python math-with-slack.py --mathjax-url=https://r.cnpmjs.org/mathjax/-/mathjax-3.0.5.tgz
+   ```
+
+
 ### Uninstall
 
 To uninstall, run the script again with the `-u` flag:
