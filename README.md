@@ -51,14 +51,15 @@ You need to exit your Slack before the installation. Then there are two ways to 
       ```
       
    If multiple versions of Slack are found on your computer, you will be asked to select one from them.
-      ```shell
-      cd path\to\math-with-slack
-      python math-with-slack.py
-      Several verisons of Slack were installed.
-       0: /mnt/c/Users/***/AppData/Local/slack/app-4.9.0/resources/app.asar
-       1: /mnt/c/Users/***/AppData/Local/slack/app-4.8.0/resources/app.asar
-      Please select a version (#/Stop): 1
-      ```
+   
+   ```
+   python math-with-slack.py
+   Several verisons of Slack were installed.
+    0: /mnt/c/Users/***/AppData/Local/slack/app-4.9.0/resources/app.asar
+    1: /mnt/c/Users/***/AppData/Local/slack/app-4.8.0/resources/app.asar
+   Please select a version (#/Stop): 1
+   ```
+   
    You can either enter the number indicating one of the listed versions
    or type Enter to select the first one. If you want to stop the
    script, you can enter `Stop`.
