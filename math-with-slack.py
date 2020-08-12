@@ -70,61 +70,60 @@ def exprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
     sys.exit(1)
 
-
 # Find path to app.asar
+
+def find_candidate_files(path_globs, filename):
+    candidates = []
+    for path_glob in path_globs:
+        candidates += glob.glob(os.path.join(path_glob, filename))
+    return candidates
+
+def display_choose_from_menu(candidates, header="", prompt=""):
+    print(header)
+    for i, candidate in enumerate(candidates):
+        if i == 0:
+            candidate += " (default)"
+        print("{}) {}".format(i, candidate))
+    choice = input(prompt).lower()
+    choice = "".join(choice.split()) # remote whitespace
+    choice = choice.strip(")") # remove trailing ')'
+    try:
+        if choice in ("", "y", "yes"):
+            choice = 0
+        else:
+            choice = int(choice)
+        return candidates[choice]
+    except:
+        exprint("Invalid choice. Please restart script.")
 
 if args.app_file is not None:
     app_path = args.app_file
-elif sys.platform == 'darwin':
-    app_path = '/Applications/Slack.app/Contents/Resources/app.asar'
-elif sys.platform.startswith('linux'):
-    for test_app_file in [
-        '/usr/lib/slack/resources/app.asar',
-        '/usr/local/lib/slack/resources/app.asar',
-        '/opt/slack/resources/app.asar',
-    ]:
-        if os.path.isfile(test_app_file):
-            app_path = test_app_file
-            break
-    test_app_files = glob.glob(
-            '/mnt/c/Users/*/AppData/Local/slack/*/resources/app.asar')
-    if len(test_app_files) == 1:
-        app_path = test_app_files[0]
-    else:
-        test_app_files.reverse()
-        print('Several verisons of Slack were installed.')
-        for idx, test_app_file in enumerate(test_app_files):
-            print('%2d: %s' % (idx, test_app_file))
-        tmp_ans = input('Please select a version (#/Stop): ')
-        if tmp_ans.lower() == '' or tmp_ans.lower() == 'yes' \
-                or tmp_ans.lower() == 'y':
-            app_path = test_app_files[0]
-        elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
-            exit()
-        else:
-            app_path = test_app_files[int(tmp_ans)]
-elif sys.platform == 'win32':
-    test_app_files = glob.glob(
-            'c:/Users/*/AppData/Local/slack/*/resources/app.asar')
-    if len(test_app_files) == 1:
-        app_path = test_app_files[0]
-    else:
-        test_app_files.reverse()
-        print('Several verisons of Slack were installed.')
-        for idx, test_app_file in enumerate(test_app_files):
-            print('%2d: %s' % (idx, test_app_file))
-        tmp_ans = input('Please select a version (#/Stop): ')
-        if tmp_ans.lower() == '' or tmp_ans.lower() == 'yes' \
-                or tmp_ans.lower() == 'y':
-            app_path = test_app_files[0]
-        elif tmp_ans.lower() == 'stop' or tmp_ans.lower() == 's':
-            exit()
-        else:
-            app_path = test_app_files[int(tmp_ans)]
-
+else:
+    path_lookups = {
+        'darwin': ['/Applications/Slack.app/Contents/Resources/'],
+        'linux': [
+            '/usr/lib/slack/resources/', 
+            '/usr/local/lib/slack/resources/',
+            '/opt/slack/resources/',
+            '/mnt/c/Users/*/AppData/Local/slack/*/resources/'
+        ],
+        'win32': [
+            'c:/Users/*/AppData/Local/slack/*/resources/'
+        ]
+    }
+    platform = sys.platform
+    if platform.startswith('linux'):
+        platform = 'linux'
+    search_paths = path_lookups[platform]
+    candidate_app_asars = find_candidate_files(search_paths, filename='app.asar')
+    if len(candidate_app_asars) == 1:
+        app_path = candidate_app_asars[0]
+    else: 
+        app_path = display_choose_from_menu(candidate_app_asars, 
+            header="Several verisons of Slack were installed.", 
+            prompt="Choose from above:")
 
 # Check so app.asar file exists
-
 try:
     if not os.path.isfile(app_path):
         exprint('Cannot find Slack at: ' + app_path)
@@ -359,28 +358,32 @@ ori_injected_file_size = json_header['files']['dist']['files'][injected_file_nam
 ori_injected_file_offset = int(json_header['files']['dist']['files'][injected_file_name]['offset'])
 
 # Download MathJax, currently assumes downloaded file is a tar called package.tar
-def reporthook(count, block_size, total_size):
-    global start_time
-    global progress_size
-    if count == 0:
-        progress_size = 0
-        start_time = time.time()
-        return
-    duration = time.time() - start_time
-    progress_size += block_size
-    if progress_size >= total_size:
-        progress_size = total_size
-    speed = progress_size / (1024 * duration)
-    percent = int(progress_size * 100 / total_size)
-    sys.stdout.write("\rDownloading MathJax...%3d%%, %3.1f MB / %3.1f MB, %6.1f KB/s, %d sec"
-        % (percent, progress_size / (1024 * 1024),
-            total_size/1024/1024, speed, duration))
-    if progress_size >= total_size:
-        sys.stdout.write("\n")
-    sys.stdout.flush()
+def get_reporthook():
+    start_time = None
+    progress_size = None
+    def reporthook(count, block_size, total_size):
+        nonlocal start_time
+        nonlocal progress_size
+        if count == 0:
+            progress_size = 0
+            start_time = time.time()
+            return
+        duration = time.time() - start_time
+        progress_size += block_size
+        if progress_size >= total_size:
+            progress_size = total_size
+        speed = progress_size / (1024 * duration)
+        percent = int(progress_size * 100 / total_size)
+        sys.stdout.write("\rDownloading MathJax...%3d%%, %3.1f MB / %3.1f MB, %6.1f KB/s, %d sec"
+            % (percent, progress_size / (1024 * 1024),
+                total_size/1024/1024, speed, duration))
+        if progress_size >= total_size:
+            sys.stdout.write("\n")
+        sys.stdout.flush()
+    return reporthook
 
 mathjax_tar_name, headers = urllib_request.urlretrieve(args.mathjax_url,
-        [], reporthook)
+        [], get_reporthook())
 mathjax_tmp_dir = tempfile.mkdtemp()
 mathjax_tar = tarfile.open(mathjax_tar_name)
 mathjax_tar.extractall(path=mathjax_tmp_dir)
