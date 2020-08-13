@@ -76,13 +76,15 @@ def find_candidate_files(path_globs, filename):
     candidates = []
     for path_glob in path_globs:
         candidates += glob.glob(os.path.join(path_glob, filename))
+    candidates =[c for c in candidates if os.path.isfile(c)]
+    candidates = sorted(candidates, key=lambda c: os.path.getctime(c), reverse=True)
     return candidates
 
 def display_choose_from_menu(candidates, header="", prompt=""):
     print(header)
     for i, candidate in enumerate(candidates):
         if i == 0:
-            candidate += " (default)"
+            candidate += " <== (default)"
         print("{}) {}".format(i, candidate))
     choice = input(prompt).lower()
     choice = "".join(choice.split()) # remote whitespace
@@ -98,6 +100,8 @@ def display_choose_from_menu(candidates, header="", prompt=""):
 
 if args.app_file is not None:
     app_path = args.app_file
+    if not os.path.isfile(app_path):
+        exprint('Cannot find Slack at ' + app_path)
 else:
     path_lookups = {
         'darwin': ['/Applications/Slack.app/Contents/Resources/'],
@@ -116,20 +120,15 @@ else:
         platform = 'linux'
     search_paths = path_lookups[platform]
     candidate_app_asars = find_candidate_files(search_paths, filename='app.asar')
+    if len(candidate_app_asars) == 0:
+        exprint(("Could not find Slack's app.asar file under {}. "
+                 "Please manually provide path (see --help)").format(search_paths))
     if len(candidate_app_asars) == 1:
         app_path = candidate_app_asars[0]
     else: 
         app_path = display_choose_from_menu(candidate_app_asars, 
-            header="Several verisons of Slack were installed.", 
+            header="Several verisons of Slack are installed.", 
             prompt="Choose from above:")
-
-# Check so app.asar file exists
-try:
-    if not os.path.isfile(app_path):
-        exprint('Cannot find Slack at: ' + app_path)
-except NameError:
-    exprint('Could not find Slack\'s app.asar file. Please provide path.')
-
 
 
 # Print info
