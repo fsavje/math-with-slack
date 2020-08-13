@@ -95,7 +95,7 @@ of versions that we have tested and the corresponding URLs.
 
 
 Some URLs works better for certain areas. You can use any URL in the
-table to install `math-with-latex`.
+table to install `math-with-slack`.
 
    ```shell
    cd path\to\math-with-slack
@@ -125,11 +125,11 @@ might find the wrong installation. In such cases, you need to specify the locati
 `app.asar` file as a parameter:
 
 ```shell
-python math-with-slack.py /My_Apps/Slack.app/Contents/Resources/app.asar
+python math-with-slack.py --app-file=/My_Apps/Slack.app/Contents/Resources/app.asar
 ```
 
 ```shell
-python math-with-slack.py c:/Users/yourusername/AppData/Local/slack/app-4.7.0/resources/app.asar
+python math-with-slack.py --app-file=c:/Users/yourusername/AppData/Local/slack/app-4.7.0/resources/app.asar
 ```
 
 
