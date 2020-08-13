@@ -18,12 +18,14 @@ Get and run the script. Restart the Slack client. You're done!
 
 ### Getting the script
 
+In the following instructions, replace any `{repo_name}` in commands by the current GitHub username of this repo. 
+
 ### Mac and Linux
 
 Run the following in a terminal:
 
 ```shell
-curl -OL https://raw.githubusercontent.com/{repo_name}/math-with-slack/master/math-with-slack.py # replace {repo_name} by the current GitHub username of the (forked) repo. 
+curl -OL https://raw.githubusercontent.com/{repo_name}/math-with-slack/master/math-with-slack.py
 sudo python math-with-slack.py
 ```
 
@@ -35,14 +37,14 @@ You need to exit your Slack before the installation. Then there are two ways to 
    1. Ubuntu subsystem
     
       ```shell
-      git clone https://github.com/YingzhouLi/math-with-slack
+      git clone https://github.com/{repo_name}/math-with-slack
       cd math-with-slack
       sudo python math-with-slack.py
       ```
       
    2. Windows PowerShell
    
-      Download `math-with-slack` as a [zip file](https://github.com/YingzhouLi/math-with-slack/archive/master.zip) and unzip it.
+      Download `math-with-slack` as a [zip file](https://github.com/{repo_name}/math-with-slack/archive/master.zip) and unzip it.
     
       ```shell
       cd path\to\math-with-slack
@@ -54,14 +56,13 @@ You need to exit your Slack before the installation. Then there are two ways to 
    ```
    python math-with-slack.py
    Several verisons of Slack were installed.
-    0: /mnt/c/Users/***/AppData/Local/slack/app-4.9.0/resources/app.asar
+    0: /mnt/c/Users/***/AppData/Local/slack/app-4.9.0/resources/app.asar (default)
     1: /mnt/c/Users/***/AppData/Local/slack/app-4.8.0/resources/app.asar
    Please select a version (#/Stop): 1
    ```
    
    You can either enter the number indicating one of the listed versions
-   or type Enter to select the first one. If you want to stop the
-   script, you can enter `Stop`.
+   or type Enter to select the first one.
    
    **Currently, we only support Slack installed from [Slack installer](https://slack.com/downloads/windows).
    If your Slack is installed through Microsoft Store, `math-with-slack` is not able to modifiy files in `WindowsApps`
@@ -94,7 +95,7 @@ of versions that we have tested and the corresponding URLs.
 
 
 Some URLs works better for certain areas. You can use any URL in the
-table to install `math-with-latex`.
+table to install `math-with-slack`.
 
    ```shell
    cd path\to\math-with-slack
@@ -124,11 +125,11 @@ might find the wrong installation. In such cases, you need to specify the locati
 `app.asar` file as a parameter:
 
 ```shell
-python math-with-slack.py /My_Apps/Slack.app/Contents/Resources/app.asar
+python math-with-slack.py --app-file=/My_Apps/Slack.app/Contents/Resources/app.asar
 ```
 
 ```shell
-python math-with-slack.py c:/Users/yourusername/AppData/Local/slack/app-4.7.0/resources/app.asar
+python math-with-slack.py --app-file=c:/Users/yourusername/AppData/Local/slack/app-4.7.0/resources/app.asar
 ```
 
 
