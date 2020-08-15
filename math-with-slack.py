@@ -238,7 +238,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(target && typeof target.getElementsByClassName === 'function') {
                     // span.c-message_kit__text for messages in the Threads View
                     // span.c-message__body for messages in the chats (i.e. direct messages)
-                    var messages = target.querySelectorAll('span.c-message__body, span.c-message_kit__text, div.p-rich_text_block');
+                    var messages = target.querySelectorAll(
+                    'span.c-message__body, span.c-message_kit__text, div.p-rich_text_block, span.c-message_attachment__text');
                     for (var i = 0; i < messages.length; i++) {
                         msg = messages[i];
                         entry_observer.observe(msg);
