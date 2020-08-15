@@ -127,7 +127,7 @@ else:
         app_path = candidate_app_asars[0]
     else: 
         app_path = display_choose_from_menu(candidate_app_asars, 
-            header="Several verisons of Slack are installed.", 
+            header="Several versions of Slack are installed.", 
             prompt="Choose from above:")
 
 
