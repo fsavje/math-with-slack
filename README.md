@@ -27,12 +27,17 @@ From there you can simply save the file's content to a local file `math-with-sla
 
 #### Option 2: using a download tool (e.g. curl, wget) 
 
-- Copy the URL of [link to math-with-slack.py](math-with-slack.py/?raw=True) (e.g. right click on the link -> copy URL).
+1. Copy the URL of [link to math-with-slack.py](math-with-slack.py/?raw=True) (e.g. right click on the link -> copy URL).
 
-- Assuming on Mac and Linux, with the tool curl available. Run the following in a terminal:
-```shell
-curl -L {PASTE_THE_COPIED_LINK_HERE} > math-with-slack.py
-```
+2. Assuming on Mac and/or Linux, use one of the alternatives:
+  - With the tool `curl` available. Run the following in a terminal:
+  ```shell
+  curl -L {PASTE_THE_COPIED_LINK_HERE} > math-with-slack.py
+  ```
+  - With the tool `wget` available. Run the following in a terminal:
+  ```
+  wget {PASTE_THE_COPIED_LINK_HERE} -O math-with-slack.py
+  ```
 
 ### Running the script
 
