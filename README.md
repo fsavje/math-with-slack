@@ -18,40 +18,42 @@ Get and run the script. Restart the Slack client. You're done!
 
 ### Getting the script
 
-In the following instructions, replace any `{repo_name}` in commands by the current GitHub username of this repo. 
+#### Option 1: Raw script content
 
-### Mac and Linux
+There are many ways to get the script. 
+This [link to math-with-slack.py](math-with-slack.py/?raw=True) should take you to the raw file content of the script, with the version relative same as README.md that you are looking at (i.e. on the same commit).
+From there you can simply save the file's content to a local file `math-with-slack.py` (e.g. you can copy the entire content, and use your favorite editor to save the content) --- this process should be the same for all platforms, and works as long as you have a decent browser and working editor.
 
-Run the following in a terminal:
 
+#### Option 2: using a download tool (e.g. curl, wget) 
+
+- Copy the URL of [link to math-with-slack.py](math-with-slack.py/?raw=True) (e.g. right click on the link -> copy URL).
+
+- Assuming on Mac and Linux, with the tool curl available. Run the following in a terminal:
 ```shell
-curl -OL https://raw.githubusercontent.com/{repo_name}/math-with-slack/master/math-with-slack.py
-sudo python math-with-slack.py
+curl -OL <PASTE_THE_COPIED_LINK_HERE>
 ```
 
-### Windows
+### Running the script
 
+- MacOS and Linux
 
-You need to exit your Slack before the installation. Then there are two ways to install `math-with-slack` on Windows.
+ ```shell
+ cd path/to/math-with-slack
+ sudo python math-with-slack.py 
+ ```
+ The installation should take effect after restarting Slack.
+ 
+- Windows
+ You need to exit your Slack before the installation.
+ ```shell
+ cd path\to\math-with-slack
+ python math-with-slack.py
+ ```
 
-   1. Ubuntu subsystem
-    
-      ```shell
-      git clone https://github.com/{repo_name}/math-with-slack
-      cd math-with-slack
-      sudo python math-with-slack.py
-      ```
-      
-   2. Windows PowerShell
-   
-      Download `math-with-slack` as a [zip file](https://github.com/{repo_name}/math-with-slack/archive/master.zip) and unzip it.
-    
-      ```shell
-      cd path\to\math-with-slack
-      python math-with-slack.py
-      ```
-      
-   If multiple versions of Slack are found on your computer, you will be asked to select one from them.
+### Selecting a Slack version
+
+If multiple versions of Slack are found on your computer, you will be asked to select one from them.
    
    ```
    python math-with-slack.py
