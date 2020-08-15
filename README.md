@@ -31,7 +31,7 @@ From there you can simply save the file's content to a local file `math-with-sla
 
 - Assuming on Mac and Linux, with the tool curl available. Run the following in a terminal:
 ```shell
-curl -L <PASTE_THE_COPIED_LINK_HERE> > math-with-slack.py
+curl -L {PASTE_THE_COPIED_LINK_HERE} > math-with-slack.py
 ```
 
 ### Running the script
