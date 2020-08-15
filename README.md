@@ -154,7 +154,7 @@ Everything is done in the client. Messages are *never* sent to servers for rende
 
 ## Can I contribute?
 
-Yes, please. Just add an [issue](https://github.com/fsavje/math-with-slack/issues) or a [pull request](https://github.com/fsavje/math-with-slack/pulls).
+Yes, please. Just add an [issue](../../issues) or a [pull request](../../pulls).
 
 
 **Thanks to past contributors:**
