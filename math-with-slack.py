@@ -372,11 +372,13 @@ def get_reporthook():
         progress_size += block_size
         if progress_size >= total_size:
             progress_size = total_size
-        speed = progress_size / (1024 * duration)
-        percent = int(progress_size * 100 / total_size)
-        sys.stdout.write("\rDownloading MathJax...%3d%%, %3.1f MB / %3.1f MB, %6.1f KB/s, %d sec"
-            % (percent, progress_size / (1024 * 1024),
-                total_size/1024/1024, speed, duration))
+        try:
+            speed = progress_size / (1024 * duration)
+            percent = int(progress_size * 100 / total_size)
+        except ZeroDivisionError:
+            speed, percent = 0, 0
+        sys.stdout.write("\rDownloading MathJax...{:3d}%, {:3.1f} MB / {:3.1f} MB, {:6.1f} KB/s, {:3.1f} sec".format(
+            percent, progress_size / (1024 * 1024), total_size / (1024 * 1024), speed, duration))
         if progress_size >= total_size:
             sys.stdout.write("\n")
         sys.stdout.flush()
