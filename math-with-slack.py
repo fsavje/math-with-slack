@@ -366,7 +366,7 @@ def get_reporthook():
         nonlocal progress_size
         if count == 0:
             progress_size = 0
-            start_time = time.time()
+            start_time = time.time() - 1e-6 # also offset a bit so we don't run into divide by zero.
             return
         duration = time.time() - start_time
         progress_size += block_size
