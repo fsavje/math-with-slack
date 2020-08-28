@@ -39,6 +39,11 @@ From there you can simply save the file's content to a local file `math-with-sla
   wget {PASTE_THE_COPIED_LINK_HERE} -O math-with-slack.py
   ```
 
+#### Option 3: using git
+
+With `git` available, you can also clone this repo, and access the script `math-with-slack.py` directly!
+
+
 ### Running the script
 
 - MacOS and Linux
@@ -150,6 +155,19 @@ Note that only users with MathJax injected in their client will see the rendered
 Users with the standard client will see the equations just as you wrote them 
 (i.e., unrendered including the dollar signs).
 
+## TeX Customization
+
+The script allows one to customize MathJax at installation time. 
+Currently the script allows the user to supply an optional [TeX input processor options](http://docs.mathjax.org/en/latest/options/input/tex.html) to custom the MathJax rendering. 
+For example, to instead use `\( ... \)` for inline math and `\[ ... \]` for display-style math, and enable the package [physics](http://docs.mathjax.org/en/latest/input/tex/extensions/physics.html?highlight=physics) support, one may use the following command line arguments during installation:
+```shell
+python math-with-slaack.py --mathjax-tex-options="{\
+  packages: {'[+]': ['noerrors', 'noundefined', 'physics']}, \
+  inlineMath: [['\\\(', '\\\\)']], \
+  displayMath: [['\\\\[', '\\\\]']], \
+}"
+```
+Note that a common scenario is when a team of people uses this plugin. In this case it will be desirable to share the same configuration for all the members. 
 
 ## How does it work?
 
