@@ -59,6 +59,10 @@ parser.add_argument('-a', '--app-file', help='Path to Slack\'s \'app.asar\' file
 parser.add_argument('--mathjax-url', 
                     help='Url to download mathjax release.', 
                     default='https://registry.npmjs.org/mathjax/-/mathjax-3.0.5.tgz')
+parser.add_argument('--mathjax-tex-options', 
+                    type=str,
+                    help='Path to file with TeX input processor options (See http://docs.mathjax.org/en/latest/options/input/tex.html).', 
+                    default='default')
 parser.add_argument('-u', '--uninstall', action='store_true', help='Removes injected MathJax code.')
 parser.add_argument('--version', action='version', version='%(prog)s ' + mws_version)
 args = parser.parse_args()
@@ -212,14 +216,9 @@ document.addEventListener('DOMContentLoaded', function() {
             'output/svg',
             '[tex]/noerrors', 
             '[tex]/noundefined', 
-            '[tex]/boldsymbol'
         ]
     },
-    tex: {
-      packages: {'[+]': ['ams', 'color', 'noerrors', 'noundefined', 'boldsymbol']},
-      inlineMath: [['$', '$']],
-      displayMath: [['$$', '$$']],
-    },
+    tex: $MATHJAX_TEX_OPTIONS$,
     startup: {
       ready: () => {
         MathJax = window.MathJax;
@@ -260,10 +259,18 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Import mathjax
-  $MATH_JAX_STUB$
+  $MATHJAX_STUB$
 });
 ''').encode('utf-8')
 
+if args.mathjax_tex_options == "default": 
+    args.mathjax_tex_options = """{
+      packages: {'[+]': ['noerrors', 'noundefined']},
+      inlineMath: [['$', '$']],
+      displayMath: [['$$', '$$']],
+    }"""
+inject_code = inject_code.replace(b"$MATHJAX_TEX_OPTIONS$", 
+    args.mathjax_tex_options.encode('utf-8'))
 
 # Make backup
 
@@ -409,7 +416,7 @@ else:
     json_header["files"]["node_modules"]["files"]["mathjax"] = mathjax_json_header["files"]["."]
     mathjax_src = "require('mathjax/es5/startup.js');"
 
-inject_code = inject_code.replace(b"$MATH_JAX_STUB$", mathjax_src)
+inject_code = inject_code.replace(b"$MATHJAX_STUB$", mathjax_src)
 
 # Modify JSON data
 
