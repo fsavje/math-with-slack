@@ -100,6 +100,7 @@ of versions that we have tested and the corresponding URLs.
 
 | Version | URLs                                                                                                         | File Size |
 |---------|--------------------------------------------------------------------------------------------------------------|-----------|
+| 3.1.0   | https://registry.npmjs.org/mathjax/-/mathjax-3.1.0.tgz <br> https://r.cnpmjs.org/mathjax/-/mathjax-3.1.0.tgz | 4.5 MB    |
 | 3.0.5   | https://registry.npmjs.org/mathjax/-/mathjax-3.0.5.tgz <br> https://r.cnpmjs.org/mathjax/-/mathjax-3.0.5.tgz | 4.4 MB    |
 | 3.0.4   | https://registry.npmjs.org/mathjax/-/mathjax-3.0.4.tgz <br> https://r.cnpmjs.org/mathjax/-/mathjax-3.0.4.tgz | 4.4 MB    |
 | 3.0.1   | https://registry.npmjs.org/mathjax/-/mathjax-3.0.1.tgz <br> https://r.cnpmjs.org/mathjax/-/mathjax-3.0.1.tgz | 6.3 MB    |
