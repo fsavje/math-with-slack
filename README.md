@@ -155,7 +155,7 @@ Note that only users with MathJax injected in their client will see the rendered
 Users with the standard client will see the equations just as you wrote them 
 (i.e., unrendered including the dollar signs).
 
-## TeX Customization
+### TeX Customization
 
 The script allows one to customize MathJax at installation time. 
 Currently the script allows the user to supply an optional [TeX input processor options](http://docs.mathjax.org/en/latest/options/input/tex.html) to custom the MathJax rendering. 
