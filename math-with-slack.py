@@ -58,7 +58,7 @@ parser = argparse.ArgumentParser(prog='math-with-slack', description='Inject Sla
 parser.add_argument('-a', '--app-file', help='Path to Slack\'s \'app.asar\' file.')
 parser.add_argument('--mathjax-url', 
                     help='Url to download mathjax release.', 
-                    default='https://registry.npmjs.org/mathjax/-/mathjax-3.0.5.tgz')
+                    default='https://registry.npmjs.org/mathjax/-/mathjax-3.1.0.tgz')
 parser.add_argument('--mathjax-tex-options', 
                     type=str,
                     help='Path to file with TeX input processor options (See http://docs.mathjax.org/en/latest/options/input/tex.html).', 
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
         skipHtmlTags: [
             'script', 'noscript', 'style', 'textarea', 'pre',
             'code', 'annotation', 'annotation-xml'
-        ],
+        ]
     },
     loader: {
         paths: {mathjax: 'mathjax/es5'},
@@ -223,6 +223,11 @@ document.addEventListener('DOMContentLoaded', function() {
       ready: () => {
         MathJax = window.MathJax;
         MathJax.startup.defaultReady();
+
+        // Disable some menu option that will cause us to crash
+        MathJax.startup.document.menu.menu.findID('Settings', 'Renderer').disable();
+        MathJax.startup.document.menu.menu.findID('Accessibility').disable();
+
         // Observer for when an element needs to be typeset
         var entry_observer = new IntersectionObserver(
           (entries, observer) => {
