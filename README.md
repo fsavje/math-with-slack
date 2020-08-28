@@ -93,7 +93,7 @@ You should use the version downloaded from [Slack's website](https://slack.com/d
 
 ### MathJax versions and URLs
 
-The default MathJax is of version 3.0.5 and downloaded from `https://registry.npmjs.org/mathjax/-/mathjax-3.0.5.tgz`, which is a registry of npmjs. 
+The default MathJax is of version 3.1.0 and downloaded from `https://registry.npmjs.org/mathjax/-/mathjax-3.1.0.tgz`, which is a registry of npmjs. 
 
 The script also works with other versions of MathJax 3 and we list a table
 of versions that we have tested and the corresponding URLs.
