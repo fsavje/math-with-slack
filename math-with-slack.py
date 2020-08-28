@@ -186,12 +186,14 @@ inject_code = ('\n\n// math-with-slack ' + mws_version + '''
 // Credit to initial implementation: https://github.com/fsavje/math-with-slack
 document.addEventListener('DOMContentLoaded', function() {
 
-  function typeset(element) {
-    const MathJax = window.MathJax;
-    MathJax.startup.promise = MathJax.startup.promise
-      .then(() => {console.log(element); return MathJax.typesetPromise(element);})
-      .catch((err) => console.log('Typeset failed: ' + err.message));
-    return MathJax.startup.promise;
+  function typeset(elements) {
+    if(elements.length) {
+        const MathJax = window.MathJax;
+        MathJax.startup.promise = MathJax.startup.promise
+          .then(() => { return MathJax.typesetPromise(elements); })
+          .catch((err) => console.log('Typeset failed: ' + err.message));
+        return MathJax.startup.promise;
+    }
   }
 
   window.MathJax = {
@@ -222,31 +224,37 @@ document.addEventListener('DOMContentLoaded', function() {
       ready: () => {
         MathJax = window.MathJax;
         MathJax.startup.defaultReady();
+        // Observer for when an element needs to be typeset
         var entry_observer = new IntersectionObserver(
           (entries, observer) => {
             var appearedEntries = entries.filter((entry) => entry.intersectionRatio > 0);
             if(appearedEntries.length) {
-                console.log(appearedEntries);
                 typeset(appearedEntries.map((entry) => entry.target));
             }
-          }, 
+          },
           { root: document.body }
         );
-        var target = document.body.addEventListener("DOMNodeInserted", 
-            function(event) {
-                var target = event.relatedNode;
-                if(target && typeof target.getElementsByClassName === 'function') {
-                    // span.c-message_kit__text for messages in the Threads View
-                    // span.c-message__body for messages in the chats (i.e. direct messages)
-                    var messages = target.querySelectorAll(
-                    'span.c-message__body, span.c-message_kit__text, div.p-rich_text_block, span.c-message_attachment__text');
-                    for (var i = 0; i < messages.length; i++) {
-                        msg = messages[i];
-                        entry_observer.observe(msg);
-                    }
+
+        // observer for elements are first inserted into the DOM.
+        // We delay elements that require typesetting to the intersection observer
+        function enque_typeset() {
+            var messages = document.querySelectorAll(
+            'span.c-message__body, span.c-message_kit__text, div.p-rich_text_block, span.c-message_attachment__text');
+            var to_typeset = [];
+            for (var i = 0; i < messages.length; i++) {
+                var msg = messages[i];
+                if(!msg.ready) {
+                    msg.ready = true;
+                    entry_observer.observe(msg);
                 }
             }
-        );
+        }
+        observer = new MutationObserver(enque_typeset);
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        enque_typeset();
       }
     },
   };
