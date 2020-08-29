@@ -16,7 +16,7 @@ The downside is that equations are not rendered for team members without the Mat
 
 Get and run the script. Restart the Slack client. You're done!
 
-Windows users without Python installed can skip and jump to [binary release](beta-binary-release-for-windows).
+Windows users without Python installed can skip and jump to [binary release](#beta-binary-release-for-windows).
 
 ### Getting the script
 
