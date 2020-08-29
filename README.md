@@ -16,6 +16,8 @@ The downside is that equations are not rendered for team members without the Mat
 
 Get and run the script. Restart the Slack client. You're done!
 
+Windows users without Python installed can skip and jump to [binary release](beta-binary-release-for-windows).
+
 ### Getting the script
 
 #### Option 1: Raw script content
@@ -60,6 +62,10 @@ With `git` available, you can also clone this repo, and access the script `math-
  cd path\to\math-with-slack
  python math-with-slack.py
  ```
+
+### Beta Binary Release for Windows
+
+We have also included pre-built executables for Windows in case Python is not available. Please see our [Releases page](../../releases) for more details.
 
 ### Selecting a Slack version
 
