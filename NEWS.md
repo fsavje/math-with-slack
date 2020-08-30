@@ -1,3 +1,8 @@
+# math-with-slack 0.4.1
+
+  * Changed default MathJax to v3.1.0
+  * Added support for building Windows executable through pyinstaller
+  
 # math-with-slack 0.4.0
 
   * Changed default MathJax to v3.0.5
