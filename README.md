@@ -165,10 +165,10 @@ Users with the standard client will see the equations just as you wrote them
 ### TeX Customization
 
 The script allows one to customize MathJax at installation time. 
-Currently the script allows the user to supply an optional [TeX input processor options](http://docs.mathjax.org/en/latest/options/input/tex.html) to custom the MathJax rendering. 
+Currently the script allows the user to supply an optional [TeX input processor option](http://docs.mathjax.org/en/latest/options/input/tex.html) to customize the MathJax rendering. 
 For example, to instead use `\( ... \)` for inline math and `\[ ... \]` for display-style math, and enable the package [physics](http://docs.mathjax.org/en/latest/input/tex/extensions/physics.html?highlight=physics) support, one may use the following command line arguments during installation:
 ```shell
-python math-with-slaack.py --mathjax-tex-options="{\
+python math-with-slack.py --mathjax-tex-options="{\
   packages: {'[+]': ['noerrors', 'noundefined', 'physics']}, \
   inlineMath: [['\\\(', '\\\\)']], \
   displayMath: [['\\\\[', '\\\\]']], \
