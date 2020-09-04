@@ -49,7 +49,7 @@ import tempfile
 
 # Math with Slack version
 
-mws_version = '0.4.1.0000'
+mws_version = '0.4.1.1'
 
 
 # Parse command line options
@@ -379,27 +379,26 @@ ori_injected_file_offset = int(json_header['files']['dist']['files'][injected_fi
 
 # Download MathJax, currently assumes downloaded file is a tar called package.tar
 def get_reporthook():
-    start_time = None
-    progress_size = None
+    class report:
+        start_time = None
+        progress_size = None
     def reporthook(count, block_size, total_size):
-        nonlocal start_time
-        nonlocal progress_size
         if count == 0:
-            progress_size = 0
-            start_time = time.time() - 1e-6 # also offset a bit so we don't run into divide by zero.
+            report.progress_size = 0
+            report.start_time = time.time() - 1e-6 # also offset a bit so we don't run into divide by zero.
             return
-        duration = time.time() - start_time
-        progress_size += block_size
-        if progress_size >= total_size:
-            progress_size = total_size
+        duration = time.time() - report.start_time
+        report.progress_size += block_size
+        if report.progress_size >= total_size:
+            report.progress_size = total_size
         try:
-            speed = progress_size / (1024 * duration)
-            percent = int(progress_size * 100 / total_size)
+            speed = report.progress_size / (1024 * duration)
+            percent = int(report.progress_size * 100 / total_size)
         except ZeroDivisionError:
             speed, percent = 0, 0
         sys.stdout.write("\rDownloading MathJax...{:3d}%, {:3.1f} MB / {:3.1f} MB, {:6.1f} KB/s, {:3.1f} sec".format(
-            percent, progress_size / (1024 * 1024), total_size / (1024 * 1024), speed, duration))
-        if progress_size >= total_size:
+            percent, report.progress_size / (1024 * 1024), total_size / (1024 * 1024), speed, duration))
+        if report.progress_size >= total_size:
             sys.stdout.write("\n")
         sys.stdout.flush()
     return reporthook
