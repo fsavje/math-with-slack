@@ -1,3 +1,10 @@
+![CI](https://github.com/thisiscam/math-with-slack/workflows/CI/badge.svg)
+
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-latest-3.6.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/macOS-latest-3.6.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/windows-latest-3.6.json)
+[See all tested platforms](ci_status.md)
+
 # Rendered math (MathJax) with Slack's desktop client
 
 [Slack](https://slack.com) does not display rendered math. The `math-with-slack` script allows you to write nice-looking math using familiar TeX syntax by injecting [MathJax](https://www.mathjax.org) into Slack's desktop client. This approach has several advantages over the plugin/bot solution:

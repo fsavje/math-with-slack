@@ -1,0 +1,113 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  badgeGistID: 02c2a5208be4374a6d0eab50ebb8e021
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [2.7, 3.6, 3.7, 3.8, pypy2, pypy3]
+        include:
+          - os: macOS-latest
+            python-version: 2.7
+          - os: macOS-latest
+            python-version: 3.6
+          - os: windows-latest
+            python-version: 2.7
+          - os: windows-latest
+            python-version: 3.6
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 requests htmlement
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      shell: bash
+    - name: Find Latest Slack URL and Versions
+      run: |
+        python find_slack_link.py
+      shell: bash
+    - name: Install Slack (Ubuntu)
+      run: |
+        wget "${SLACK_DOWNLOAD_URL}" -O slack.rpm
+        sudo apt-get install alien
+        sudo alien -i -k slack.rpm
+      if: matrix.os == 'ubuntu-latest'
+    - name: Install Slack (MacOS)
+      run: |
+        wget "${SLACK_DOWNLOAD_URL}" -O slack.dmg
+        hdiutil attach slack.dmg
+        sudo cp -rf /Volumes/Slack.app/Slack.app /Applications
+      if: matrix.os == 'macOS-latest'
+    - name: Install Slack (Windows)
+      run: |
+        $WebClient = New-Object System.Net.WebClient
+        $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack.exe")
+        ./slack.exe
+        Start-Sleep -s 15
+      if: matrix.os == 'windows-latest'
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        # flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test run the script (Ubuntu and MacOS)
+      run: |
+        sudo python math-with-slack.py
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
+    - name: Test run the script (Windows)
+      run: |
+        python math-with-slack.py
+      shell: bash
+      if: matrix.os == 'windows-latest'
+    - name: Create Success Badge
+      uses: schneegans/dynamic-badges-action@v1.0.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: ${{ env.badgeGistID }}
+        filename: ${{ matrix.os }}-${{ matrix.python-version }}.json
+        label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
+        message: passing
+        color: green
+      if: ${{ success() }}
+    - name: Create Unknown Badge
+      uses: schneegans/dynamic-badges-action@v1.0.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: ${{ env.badgeGistID }}
+        filename: ${{ matrix.os }}-${{ matrix.python-version }}.json
+        label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
+        message: unknown
+        color: lightgrey
+      if: ${{ cancelled() }}
+    - name: Create Failure Badge
+      uses: schneegans/dynamic-badges-action@v1.0.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: ${{ env.badgeGistID }}
+        filename: ${{ matrix.os }}-${{ matrix.python-version }}.json
+        label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
+        message: failed
+        isError: true
+      if: ${{ failure() }}
