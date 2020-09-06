@@ -1,5 +1,6 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+# Continuous Integration
+# This workflow downloads Slack over different environments 
+# and perform test runs of the install script
 
 name: CI
 
@@ -8,9 +9,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
-env:
-  badgeGistID: 02c2a5208be4374a6d0eab50ebb8e021
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   build:
@@ -85,7 +85,7 @@ jobs:
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: ${{ env.badgeGistID }}
+        gistID: ${{ secrets.BADGE_GIST_ID }}
         filename: ${{ matrix.os }}-${{ matrix.python-version }}.json
         label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
         message: passing
@@ -95,7 +95,7 @@ jobs:
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: ${{ env.badgeGistID }}
+        gistID: ${{ secrets.BADGE_GIST_ID }}
         filename: ${{ matrix.os }}-${{ matrix.python-version }}.json
         label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
         message: unknown
@@ -105,7 +105,7 @@ jobs:
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: ${{ env.badgeGistID }}
+        gistID: ${{ secrets.BADGE_GIST_ID }}
         filename: ${{ matrix.os }}-${{ matrix.python-version }}.json
         label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
         message: failed
