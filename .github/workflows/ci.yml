@@ -45,7 +45,7 @@ jobs:
       shell: bash
     - name: Find Latest Slack URL and Versions
       run: |
-        python find_slack_link.py
+        python .github/workflows/find_slack_link.py
       shell: bash
     - name: Install Slack (Ubuntu)
       run: |
