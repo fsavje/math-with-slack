@@ -90,7 +90,7 @@ jobs:
         label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
         message: passing
         color: green
-      if: ${{ success() }}
+      if: ${{ success() && github.event_name != "pull_request" }}
     - name: Create Unknown Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
@@ -100,7 +100,7 @@ jobs:
         label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
         message: unknown
         color: lightgrey
-      if: ${{ cancelled() }}
+      if: ${{ cancelled() && github.event_name != "pull_request" }}
     - name: Create Failure Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
@@ -110,4 +110,4 @@ jobs:
         label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
         message: failed
         isError: true
-      if: ${{ failure() }}
+      if: ${{ failure() && github.event_name != "pull_request" }}
