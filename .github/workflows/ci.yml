@@ -13,6 +13,40 @@ on:
     - cron: "0 0 * * *"
 
 jobs:
+
+  # Job that downloads slack for all platforms and upload as artifacts
+  download-slack:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install Dependencies
+      run: |
+        pip install git+https://github.com/alirezamika/autoscraper.git
+    - name: Find Latest Slack URL and Versions
+      run: |
+        python .github/workflows/download_slack.py --do_download linux
+        python .github/workflows/download_slack.py --do_download macos
+        python .github/workflows/download_slack.py --do_download windows
+    - name: Upload Slack Linux
+      uses: actions/upload-artifact@v2
+      with:
+        name: slack--linux-latest
+        path: linux
+    - name: Upload Slack MacOS
+      uses: actions/upload-artifact@v2
+      with:
+        name: slack--macos-latest
+        path: macos
+    - name: Upload Slack Windows
+      uses: actions/upload-artifact@v2
+      with:
+        name: slack--windows-latest
+        path: windows
+
   build:
 
     runs-on: ${{ matrix.os }}
@@ -33,15 +67,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Find Latest Slack URL and Versions
-      run: |
-        pip install git+https://github.com/alirezamika/autoscraper.git
-        python .github/workflows/find_slack_link.py
-      shell: bash
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -52,23 +77,29 @@ jobs:
         pip install flake8
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       shell: bash
+    - name: Download Slack (from common artifact)
+      uses: actions/download-artifact@v2
+      with:
+        name: slack--${{ matrix.os }}
+        path: slack
+    - name: Get Slack Version
+      run: |
+        version=`cat slack/version.txt`
+        echo "::env name=SLACK_VERSION::${version}"
+      shell: bash
     - name: Install Slack (Ubuntu)
       run: |
-        wget "${SLACK_DOWNLOAD_URL}" -O slack.rpm
         sudo apt-get install alien
-        sudo alien -i -k slack.rpm
+        sudo alien -i -k slack/slack.rpm
       if: matrix.os == 'ubuntu-latest'
     - name: Install Slack (MacOS)
       run: |
-        wget "${SLACK_DOWNLOAD_URL}" -O slack.dmg
-        hdiutil attach slack.dmg
+        hdiutil attach slack/slack.dmg
         sudo cp -rf /Volumes/Slack.app/Slack.app /Applications
       if: matrix.os == 'macOS-latest'
     - name: Install Slack (Windows)
       run: |
-        $WebClient = New-Object System.Net.WebClient
-        $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack.exe")
-        .\slack.exe
+        .\slack\slack.exe
         while (!(Test-Path "$env:userprofile\Desktop\Slack.lnk")) { Start-Sleep 10 }
       if: matrix.os == 'windows-latest'
     - name: Lint with flake8
