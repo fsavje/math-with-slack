@@ -68,8 +68,8 @@ jobs:
       run: |
         $WebClient = New-Object System.Net.WebClient
         $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack.exe")
-        ./slack.exe
-        Start-Sleep -s 15
+        .\slack.exe
+        while (!(Test-Path "$env:userprofile\Desktop\Slack.lnk")) { Start-Sleep 10 }
       if: matrix.os == 'windows-latest'
     - name: Lint with flake8
       run: |
