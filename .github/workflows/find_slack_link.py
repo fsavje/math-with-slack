@@ -45,5 +45,5 @@ scraper.load(os.path.join(model_dir, "slack_download_url.json"))
 download_url = scraper.get_result_exact(os_instruction_link)[0]
 download_url = urljoin(os_instruction_link, download_url)
 
-print("::set-env name=SLACK_VERSION::{}".format(verson))
+print("::set-env name=SLACK_VERSION::{}".format(version))
 print("::set-env name=SLACK_DOWNLOAD_URL::{}".format(download_url))
