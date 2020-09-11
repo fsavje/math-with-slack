@@ -14,9 +14,13 @@ on:
 
 jobs:
 
-  # Job that downloads slack for all platforms and upload as artifacts
-  download-slack:
-    runs-on: ubuntu-latest
+  # Job to download slack for eacg platform and cache the installer
+  download_slack:
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        os: [ubuntu, windows, macOS]
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
@@ -26,43 +30,71 @@ jobs:
     - name: Install Dependencies
       run: |
         pip install git+https://github.com/alirezamika/autoscraper.git
+      shell: bash
     - name: Find Latest Slack URL and Versions
       run: |
-        python .github/workflows/download_slack.py --do_download linux
-        python .github/workflows/download_slack.py --do_download macos
-        python .github/workflows/download_slack.py --do_download windows
-    - name: Upload Slack Linux
-      uses: actions/upload-artifact@v2
+        export SLACK_VERSION=`python .github/workflows/download_slack.py --get-version ${{ matrix.os }}`
+        echo "${SLACK_VERSION}" > ${{ matrix.os }}-version.txt
+        echo "::set-env name=SLACK_VERSION::${SLACK_VERSION}"
+      shell: bash
+
+    # Save the versions as caches
+    - name: Save Slack Version Ubuntu 
+      uses: actions/cache@v2
       with:
-        name: slack--linux-latest
-        path: linux
-    - name: Upload Slack MacOS
-      uses: actions/upload-artifact@v2
+        path: ${{ matrix.os }}-version.txt
+        key: ${{ matrix.os }}-slack-version=${{ env.SLACK_VERSION }}
+
+    # Cache downloaded Slack
+    - name: Cache Slack Ubuntu
+      id: cache-download
+      uses: actions/cache@v2
       with:
-        name: slack--macos-latest
-        path: macos
-    - name: Upload Slack Windows
-      uses: actions/upload-artifact@v2
-      with:
-        name: slack--windows-latest
-        path: windows
+        path: slack-download-${{ matrix.os }}
+        key: ${{ matrix.os }}-slack-${{ env.SLACK_VERSION }}
+
+    # Actual download if cache misses
+    - name: Get Slack Download URL and Prepare Download
+      if: steps.cache-download.outputs.cache-hit != 'true'
+      run: |
+        export SLACK_DOWNLOAD_URL=$(python .github/workflows/download_slack.py --get-download-url ${{ matrix.os }})
+        echo "::set-env name=SLACK_DOWNLOAD_URL::${SLACK_DOWNLOAD_URL}"
+        mkdir slack-download-${{ matrix.os }}
+      shell: bash
+
+    - name: Download Slack Ubuntu
+      if: steps.cache-download.outputs.cache-hit != 'true' && matrix.os == 'ubuntu'
+      run: |
+        wget "${{ env.SLACK_DOWNLOAD_URL }}" -O slack-download-ubuntu/slack.rpm
+
+    - name: Download Slack MacOS
+      if: steps.cache-download.outputs.cache-hit != 'true' && matrix.os == 'macOS'
+      run: |
+        wget "${{ env.SLACK_DOWNLOAD_URL }}" -O slack-download-macOS/slack.dmg
+
+    - name: Download Slack Windows
+      if: steps.cache-download.outputs.cache-hit != 'true' && matrix.os == 'windows'
+      run: |
+        $WebClient = New-Object System.Net.WebClient
+        $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack-download-windows\slack.exe")
 
   build:
+    needs: download_slack
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu]
         python-version: [2.7, 3.6, 3.7, 3.8, pypy2, pypy3]
         include:
-          - os: macOS-latest
+          - os: macOS
             python-version: 2.7
-          - os: macOS-latest
+          - os: macOS
             python-version: 3.6
-          - os: windows-latest
+          - os: windows
             python-version: 2.7
-          - os: windows-latest
+          - os: windows
             python-version: 3.6
 
     steps:
@@ -77,31 +109,41 @@ jobs:
         pip install flake8
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       shell: bash
-    - name: Download Slack (from common artifact)
-      uses: actions/download-artifact@v2
+    
+    - name: Get Slack Version (step 1) 
+      uses: actions/cache@v2
       with:
-        name: slack--${{ matrix.os }}
-        path: slack
-    - name: Get Slack Version
+        path: ${{ matrix.os }}-version.txt
+        key: notused
+        restore-keys: ${{ matrix.os }}-slack-version=
+
+    - name: Get Slack Version (step 2)
       run: |
-        version=`cat slack/version.txt`
-        echo "::env name=SLACK_VERSION::${version}"
+        version=`cat ${{ matrix.os }}-version.txt`
+        echo "::set-env name=SLACK_VERSION::${version}"
       shell: bash
+
+    - name: Get Slack Downloaded from cache
+      uses: actions/cache@v2
+      with:
+        path: slack-download-${{ matrix.os }}
+        key: ${{ matrix.os }}-slack-${{ env.SLACK_VERSION }}
+
     - name: Install Slack (Ubuntu)
       run: |
         sudo apt-get install alien
-        sudo alien -i -k slack/slack.rpm
-      if: matrix.os == 'ubuntu-latest'
+        sudo alien -i -k slack-download-ubuntu/slack.rpm
+      if: matrix.os == 'ubuntu'
     - name: Install Slack (MacOS)
       run: |
-        hdiutil attach slack/slack.dmg
+        hdiutil attach slack-download-macOS/slack.dmg
         sudo cp -rf /Volumes/Slack.app/Slack.app /Applications
-      if: matrix.os == 'macOS-latest'
+      if: matrix.os == 'macOS'
     - name: Install Slack (Windows)
       run: |
-        .\slack\slack.exe
+        .\slack-download-windows\slack.exe
         while (!(Test-Path "$env:userprofile\Desktop\Slack.lnk")) { Start-Sleep 10 }
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows'
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -111,12 +153,12 @@ jobs:
     - name: Test run the script (Ubuntu and MacOS)
       run: |
         sudo python math-with-slack.py
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
+      if: matrix.os == 'ubuntu' || matrix.os == 'macOS'
     - name: Test run the script (Windows)
       run: |
         python math-with-slack.py
       shell: bash
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows'
     - name: Create Success Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:

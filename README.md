@@ -1,8 +1,8 @@
 ![CI](https://github.com/thisiscam/math-with-slack/workflows/CI/badge.svg)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-latest-3.6.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/macOS-latest-3.6.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/windows-latest-3.6.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-3.6.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/macOS-3.6.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/windows-3.6.json)
 <details>
 <summary>
 Expand to see all tested systems
@@ -16,31 +16,31 @@ However, if you find that something is not working (e.g. math rendering does not
 
 ### Ubuntu
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-latest-2.7.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-2.7.json)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-latest-3.6.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-3.6.json)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-latest-3.7.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-3.7.json)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-latest-3.8.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-3.8.json)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-latest-pypy2.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-pypy2.json)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-latest-pypy3.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-pypy3.json)
 
 
 ### MacOS
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/macOS-latest-2.7.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/macOS-2.7.json)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/macOS-latest-3.6.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/macOS-3.6.json)
 
 
 ### Windows
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/windows-latest-2.7.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/windows-2.7.json)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/windows-latest-3.6.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/windows-3.6.json)
 
 </p>
 </details>
