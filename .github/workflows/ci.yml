@@ -159,13 +159,23 @@ jobs:
         python math-with-slack.py
       shell: bash
       if: matrix.os == 'windows'
+    - name: Prepare Badge Creation
+      run: |
+        if [ "${{ matrix.os }}" = "macOS" ]; then
+          BADGE_LOGO="apple"
+        else
+          BADGE_LOGO=${{ matrix.os }}
+        fi
+        echo ":set-env name=BADGE_LOGO::${BADGE_LOGO}"
+      shell: bash
     - name: Create Success Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: ${{ secrets.BADGE_GIST_ID }}
         filename: ${{ matrix.os }}-${{ matrix.python-version }}.json
-        label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
+        label: ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
+        namedLogo: ${{ env.BADGE_LOGO }}
         message: passing
         color: green
       if: ${{ success() && github.event_name != 'pull_request' }}
@@ -175,8 +185,9 @@ jobs:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: ${{ secrets.BADGE_GIST_ID }}
         filename: ${{ matrix.os }}-${{ matrix.python-version }}.json
-        label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
+        label: ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
         message: unknown
+        namedLogo: ${{ env.BADGE_LOGO }}
         color: lightgrey
       if: ${{ cancelled() && github.event_name != 'pull_request' }}
     - name: Create Failure Badge
@@ -185,7 +196,8 @@ jobs:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: ${{ secrets.BADGE_GIST_ID }}
         filename: ${{ matrix.os }}-${{ matrix.python-version }}.json
-        label: OS ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
+        label: ${{ matrix.os }} | Python ${{ matrix.python-version }} | Slack ${{ env.SLACK_VERSION }}
         message: failed
+        namedLogo: ${{ env.BADGE_LOGO }}
         isError: true
       if: ${{ failure() && github.event_name != 'pull_request' }}
