@@ -166,7 +166,7 @@ jobs:
         else
           BADGE_LOGO=${{ matrix.os }}
         fi
-        echo ":set-env name=BADGE_LOGO::${BADGE_LOGO}"
+        echo "::set-env name=BADGE_LOGO::${BADGE_LOGO}"
       shell: bash
     - name: Create Success Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
