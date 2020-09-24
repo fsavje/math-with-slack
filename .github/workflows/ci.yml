@@ -110,11 +110,16 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       shell: bash
     
+    - name: Get Date
+    id: get-date
+    run: |
+      echo "::set-output name=date::$(/bin/date)"
+    shell: bash
     - name: Get Slack Version (step 1) 
       uses: actions/cache@v2
       with:
         path: ${{ matrix.os }}-version.txt
-        key: notused
+        key: ${{ matrix.os }}-${{ steps.get-date.outputs.date }}
         restore-keys: ${{ matrix.os }}-slack-version=
 
     - name: Get Slack Version (step 2)
