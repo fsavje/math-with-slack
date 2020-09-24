@@ -111,10 +111,10 @@ jobs:
       shell: bash
     
     - name: Get Date
-    id: get-date
-    run: |
-      echo "::set-output name=date::$(/bin/date)"
-    shell: bash
+      id: get-date
+      run: |
+        echo "::set-output name=date::$(/bin/date)"
+      shell: bash
     - name: Get Slack Version (step 1) 
       uses: actions/cache@v2
       with:
