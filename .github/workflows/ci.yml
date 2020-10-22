@@ -35,7 +35,7 @@ jobs:
       run: |
         export SLACK_VERSION=`python .github/workflows/download_slack.py --get-version ${{ matrix.os }}`
         echo "${SLACK_VERSION}" > ${{ matrix.os }}-version.txt
-        echo "::set-env name=SLACK_VERSION::${SLACK_VERSION}"
+        echo "SLACK_VERSION=${SLACK_VERSION}" >> $GITHUB_ENV
       shell: bash
 
     # Save the versions as caches
@@ -58,7 +58,7 @@ jobs:
       if: steps.cache-download.outputs.cache-hit != 'true'
       run: |
         export SLACK_DOWNLOAD_URL=$(python .github/workflows/download_slack.py --get-download-url ${{ matrix.os }})
-        echo "::set-env name=SLACK_DOWNLOAD_URL::${SLACK_DOWNLOAD_URL}"
+        echo "SLACK_DOWNLOAD_URL=${SLACK_DOWNLOAD_URL}" >> $GITHUB_ENV
         mkdir slack-download-${{ matrix.os }}
       shell: bash
 
@@ -125,7 +125,7 @@ jobs:
     - name: Get Slack Version (step 2)
       run: |
         version=`cat ${{ matrix.os }}-version.txt`
-        echo "::set-env name=SLACK_VERSION::${version}"
+        echo "SLACK_VERSION=${version}" >> $GITHUB_ENV
       shell: bash
 
     - name: Get Slack Downloaded from cache
@@ -171,7 +171,7 @@ jobs:
         else
           BADGE_LOGO=${{ matrix.os }}
         fi
-        echo "::set-env name=BADGE_LOGO::${BADGE_LOGO}"
+        echo "BADGE_LOGO=${BADGE_LOGO}" >> $GITHUB_ENV
       shell: bash
     - name: Create Success Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
