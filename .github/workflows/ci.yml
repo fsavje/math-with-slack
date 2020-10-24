@@ -39,14 +39,14 @@ jobs:
       shell: bash
 
     # Save the versions as caches
-    - name: Save Slack Version Ubuntu 
+    - name: Save Slack Version 
       uses: actions/cache@v2
       with:
         path: ${{ matrix.os }}-version.txt
         key: ${{ matrix.os }}-slack-version=${{ env.SLACK_VERSION }}
 
     # Cache downloaded Slack
-    - name: Cache Slack Ubuntu
+    - name: Cache Slack
       id: cache-download
       uses: actions/cache@v2
       with:
