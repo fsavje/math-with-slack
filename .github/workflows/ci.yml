@@ -148,6 +148,7 @@ jobs:
       run: |
         .\slack-download-windows\slack.exe
         while (!(Test-Path "$env:userprofile\Desktop\Slack.lnk")) { Start-Sleep 10 }
+        Stop-Process -Name slack
       if: matrix.os == 'windows'
     - name: Lint with flake8
       run: |
