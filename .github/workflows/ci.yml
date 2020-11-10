@@ -79,10 +79,13 @@ jobs:
         $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack-download-windows\slack.exe")
 
   build:
+    
     needs: download_slack
 
+    continue-on-error: true
+    
     runs-on: ${{ matrix.os }}-latest
-
+    
     strategy:
       matrix:
         os: [ubuntu]
