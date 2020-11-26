@@ -117,7 +117,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ matrix.os }}-version.txt
-        key: ${{ matrix.os }}-${{ env.GITHUB_RUN_NUMBER }}
+        key: ${{ matrix.os }}-${{ github.run_number }}
         restore-keys: ${{ matrix.os }}-slack-version=
 
     - name: Get Slack Version (step 2)
