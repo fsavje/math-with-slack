@@ -205,3 +205,25 @@ jobs:
         namedLogo: ${{ env.BADGE_LOGO }}
         isError: true
       if: ${{ failure() && github.event_name != 'pull_request' }}
+    - name: Set exit code
+      uses: actions/cache@v2
+      with:
+        path: failed.txt
+        key: ${{ github.run_number }}-failed
+        if: ${{ failure() }}
+  
+  summary:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get exit code from cache
+      id: get_exit_code
+      uses: actions/cache@v2
+      with:
+        path: failed.txt
+        key: ${{ github.run_number }}-failed
+    - name: Set CI Status
+      if: steps.get_exit_code.outputs.cache-hit == 'true'
+      run: |
+        echo "At least a job failed" 
+        exit 1
