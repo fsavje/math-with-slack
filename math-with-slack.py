@@ -119,7 +119,7 @@ else:
             '/mnt/c/Users/*/AppData/Local/slack/*/resources/'
         ],
         'win32': [
-            'c:/Users/*/AppData/Local/slack/*/resources/'
+            'c:\\Users\\*\\AppData\\Local\\slack\\*\\resources\\'
         ]
     }
     platform = sys.platform

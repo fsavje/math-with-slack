@@ -77,7 +77,7 @@ jobs:
       run: |
         $WebClient = New-Object System.Net.WebClient
         $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack-download-windows\slack.exe")
-
+  
   build:
     
     needs: download_slack
@@ -113,16 +113,11 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       shell: bash
     
-    - name: Get Date
-      id: get-date
-      run: |
-        echo "::set-output name=date::$(/bin/date)"
-      shell: bash
     - name: Get Slack Version (step 1) 
       uses: actions/cache@v2
       with:
         path: ${{ matrix.os }}-version.txt
-        key: ${{ matrix.os }}-${{ steps.get-date.outputs.date }}
+        key: ${{ matrix.os }}-${{ github.run_number }}
         restore-keys: ${{ matrix.os }}-slack-version=
 
     - name: Get Slack Version (step 2)
@@ -151,7 +146,7 @@ jobs:
       run: |
         .\slack-download-windows\slack.exe
         while (!(Test-Path "$env:userprofile\Desktop\Slack.lnk")) { Start-Sleep 10 }
-        Stop-Process -Name slack
+        Stop-Process -Name slack -passthru| Wait-Process
       if: matrix.os == 'windows'
     - name: Lint with flake8
       run: |
@@ -210,3 +205,25 @@ jobs:
         namedLogo: ${{ env.BADGE_LOGO }}
         isError: true
       if: ${{ failure() && github.event_name != 'pull_request' }}
+    - name: Set exit code
+      uses: actions/cache@v2
+      with:
+        path: failed.txt
+        key: ${{ github.run_number }}-failed
+      if: ${{ failure() }}
+  
+  summary:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get exit code from cache
+      id: get_exit_code
+      uses: actions/cache@v2
+      with:
+        path: failed.txt
+        key: ${{ github.run_number }}-failed
+    - name: Set CI Status
+      if: steps.get_exit_code.outputs.cache-hit == 'true'
+      run: |
+        echo "At least a job failed" 
+        exit 1
