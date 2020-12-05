@@ -205,7 +205,11 @@ jobs:
         namedLogo: ${{ env.BADGE_LOGO }}
         isError: true
       if: ${{ failure() && github.event_name != 'pull_request' }}
-    - name: Set exit code
+    - name: Set exit code (Step 1)
+      run: touch failed.txt
+      shell: bash
+      if: ${{ failure() }}
+    - name: Set exit code (Step 2)
       uses: actions/cache@v2
       with:
         path: failed.txt
