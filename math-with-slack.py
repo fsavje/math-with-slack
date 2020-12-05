@@ -85,7 +85,7 @@ def _windows_process_exists(process_name):
     return last_line.lower().startswith(process_name.lower())
 
 def _diagnose_permission(e, app_path):
-    err_msg = None
+    err_msg = ""
     if sys.platform == "win32":
         if _windows_process_exists("slack.exe"):
             err_msg = ("Possibile fix:\n"
@@ -189,7 +189,7 @@ if 'MWSINJECT' in json_check['files']:
         shutil.move(app_backup_path, app_path)
     except Exception as e:
         print(e)
-        diagnosis = _diagnose_permission(app_path)
+        diagnosis = _diagnose_permission(e, app_path)
         exprint('Cannot remove previously injected code. Make sure the script has write permissions. ' + diagnosis)
 
 
@@ -200,7 +200,7 @@ if os.path.isfile(app_backup_path):
         os.remove(app_backup_path)
     except Exception as e:
         print(e)
-        diagnosis = _diagnose_permission(app_backup_path)
+        diagnosis = _diagnose_permission(e, app_backup_path)
         exprint('Cannot remove old backup. Make sure the script has write permissions. ' + diagnosis)
 
 
