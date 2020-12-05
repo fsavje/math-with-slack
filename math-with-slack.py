@@ -74,6 +74,7 @@ def exprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
     sys.exit(1)
 
+
 # Find path to app.asar
 
 def find_candidate_files(path_globs, filename):
@@ -83,6 +84,7 @@ def find_candidate_files(path_globs, filename):
     candidates =[c for c in candidates if os.path.isfile(c)]
     candidates = sorted(candidates, key=lambda c: os.path.getctime(c), reverse=True)
     return candidates
+
 
 def display_choose_from_menu(candidates, header="", prompt=""):
     print(header)
@@ -101,6 +103,7 @@ def display_choose_from_menu(candidates, header="", prompt=""):
         return candidates[choice]
     except:
         exprint("Invalid choice. Please restart script.")
+
 
 if args.app_file is not None:
     app_path = args.app_file
@@ -136,7 +139,6 @@ else:
 
 
 # Print info
-
 print('Using Slack installation at: ' + app_path)
 
 
@@ -279,11 +281,38 @@ inject_code = inject_code.replace(b"$MATHJAX_TEX_OPTIONS$",
 
 # Make backup
 
+def _windows_process_exists(process_name):
+    call = 'TASKLIST', '/FI', 'imagename eq %s' % process_name
+    # use buildin check_output right away
+    output = subprocess.check_output(call).decode()
+    # check in last line for process name
+    last_line = output.strip().split('\r\n')[-1]
+    # because Fail message could be translated
+    return last_line.lower().startswith(process_name.lower())
+
+
 try:
     shutil.copy(app_path, app_backup_path)
 except Exception as e:
     print(e)
-    exprint('Cannot make backup. Make sure the script has write permissions.')
+    err_msg = ("Cannot make backup of {}. "
+               "Please Make sure the script has write permissions. ").format(app_path)
+    # Handle some possible failure cases
+    if sys.platform == "win32":
+        if _windows_process_exists("slack.exe"):
+            exprint(err_msg +
+                    ("Possibile fix:\n"
+                     "\tSeems like your Slack is running. "
+                     "Please close Slack and re-run the script."))
+    elif sys.platform.startswith("linux"):
+        app_path = os.path.normpath(app_path)
+        app_path_parts = path.split(os.sep)
+        if "snap" in app_path_parts:
+            exprint(err_msg + 
+                    ("Possibile fix:\n"
+                     "\tSeems like you have a Snap install that this script might not support."
+                     "Please check README for more details."))
+    exprint(err_msg)
 
 
 # Get file info
