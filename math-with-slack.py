@@ -94,7 +94,7 @@ def _diagnose_permission(e, app_path):
                        "Please close Slack and re-run the script.")
     elif sys.platform.startswith("linux"):
         app_path = os.path.normpath(app_path)
-        app_path_parts = path.split(os.sep)
+        app_path_parts = os.path.split(os.sep)
         if "snap" in app_path_parts:
             err_msg = ("Possibile fix:\n"
                        "\tSeems like you have a Snap install that this script might not support."
