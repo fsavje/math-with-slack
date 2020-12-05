@@ -29,6 +29,7 @@ import glob
 import shutil
 import struct
 import sys
+import subprocess
 import time
 from distutils.version import LooseVersion
 
