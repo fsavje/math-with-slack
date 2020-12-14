@@ -294,6 +294,20 @@ document.addEventListener('DOMContentLoaded', function() {
     },
   };
 
+  var ctxMenustyle = document.createElement('style');
+  ctxMenustyle.innerHTML = `
+  .CtxtMenu_MenuFrame {
+    z-index: 10000 !important;
+  }
+  .CtxtMenu_Menu {
+    z-index: 10000 !important;
+  }
+  .CtxtMenu_Info {
+    z-index: 10000 !important;
+  }
+  `;
+  document.body.appendChild(ctxMenustyle);
+
   // Import mathjax
   $MATHJAX_STUB$
 });
