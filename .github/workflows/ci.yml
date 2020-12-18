@@ -172,6 +172,7 @@ jobs:
         fi
         echo "BADGE_LOGO=${BADGE_LOGO}" >> $GITHUB_ENV
       shell: bash
+      if: ${{ always() && github.event_name != 'pull_request' }}
     - name: Create Success Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
