@@ -479,9 +479,6 @@ json_header['files']['dist']['files'][injected_file_name]['offset'] = str(ori_da
 new_json_header = json.dumps(json_header, separators=(',', ':')).encode('utf-8')
 new_json_header_padding = (4 - len(new_json_header) % 4) % 4
 
-xxx = open(app_path, mode='wb')
-xxx.close()
-
 with open(app_backup_path, mode='rb') as ori_app_fp, \
      open(app_path, mode='wb') as new_app_fp:
     # Header
