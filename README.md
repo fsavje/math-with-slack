@@ -26,9 +26,9 @@ However, if you find that something is not working (e.g. math rendering does not
 
 ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-3.9.json)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-pypy2.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-pypy-2.7.json)
 
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-pypy3.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/thisiscam/02c2a5208be4374a6d0eab50ebb8e021/raw/ubuntu-pypy-3.7.json)
 
 
 ### MacOS
