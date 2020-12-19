@@ -76,7 +76,7 @@ jobs:
       if: steps.cache-download.outputs.cache-hit != 'true' && matrix.os == 'windows'
       run: |
         $WebClient = New-Object System.Net.WebClient
-        $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack-download-windows\slack.exe")
+        $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack-download-windows\slack.msi")
   
   build:
     
@@ -144,9 +144,7 @@ jobs:
       if: matrix.os == 'macOS'
     - name: Install Slack (Windows)
       run: |
-        .\slack-download-windows\slack.exe
-        while (!(Test-Path "$env:userprofile\Desktop\Slack.lnk")) { Start-Sleep 10 }
-        Stop-Process -Name slack -passthru| Wait-Process
+        Start-Process MsiExec.exe -ArgumentList "/i .\slack-download-windows\slack.msi /qr /norestart" -wait
       if: matrix.os == 'windows'
     - name: Lint with flake8
       run: |
@@ -160,7 +158,7 @@ jobs:
       if: matrix.os == 'ubuntu' || matrix.os == 'macOS'
     - name: Test run the script (Windows)
       run: |
-        python math-with-slack.py
+        python math-with-slack.py -a 'C:\Program Files\Slack\resources\app.asar'
       shell: bash
       if: matrix.os == 'windows'
     - name: Prepare Badge Creation
