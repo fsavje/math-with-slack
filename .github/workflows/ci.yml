@@ -147,7 +147,8 @@ jobs:
       if: matrix.os == 'macOS'
     - name: Install Slack (Windows)
       run: |
-        Start-Process MsiExec.exe -ArgumentList "/i .\slack-download-windows\slack.msi /qr /norestart" -wait
+        cd slack-download-windows
+        Start-Process MsiExec.exe -ArgumentList "/i slack.msi /qr /norestart" -wait
       if: matrix.os == 'windows'
     - name: Lint with flake8
       run: |
