@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+env:
+  CI_VERSION: ci-v2
+
 jobs:
 
   # Job to download slack for eacg platform and cache the installer
@@ -29,7 +32,7 @@ jobs:
         python-version: 3.8
     - name: Install Dependencies
       run: |
-        pip install autoscraper==1.1.1
+        pip install autoscraper==1.1.10
       shell: bash
     - name: Find Latest Slack URL and Versions
       run: |
@@ -43,7 +46,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ matrix.os }}-version.txt
-        key: ${{ matrix.os }}-slack-version=${{ env.SLACK_VERSION }}
+        key: ${{ env.CI_VERSION }}-${{ matrix.os }}-slack-version=${{ env.SLACK_VERSION }}
 
     # Cache downloaded Slack
     - name: Cache Slack
@@ -51,7 +54,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: slack-download-${{ matrix.os }}
-        key: ${{ matrix.os }}-slack-${{ env.SLACK_VERSION }}
+        key: ${{ env.CI_VERSION }}-${{ matrix.os }}-slack-${{ env.SLACK_VERSION }}
 
     # Actual download if cache misses
     - name: Get Slack Download URL and Prepare Download
@@ -76,7 +79,7 @@ jobs:
       if: steps.cache-download.outputs.cache-hit != 'true' && matrix.os == 'windows'
       run: |
         $WebClient = New-Object System.Net.WebClient
-        $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack-download-windows\slack.exe")
+        $WebClient.DownloadFile("${{ env.SLACK_DOWNLOAD_URL }}", "slack-download-windows\slack.msi")
   
   build:
     
@@ -117,8 +120,8 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ matrix.os }}-version.txt
-        key: ${{ matrix.os }}-${{ github.run_number }}
-        restore-keys: ${{ matrix.os }}-slack-version=
+        key: ${{ env.CI_VERSION }}-${{ matrix.os }}-${{ github.run_number }}
+        restore-keys: ${{ env.CI_VERSION }}-${{ matrix.os }}-slack-version=
 
     - name: Get Slack Version (step 2)
       run: |
@@ -130,7 +133,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: slack-download-${{ matrix.os }}
-        key: ${{ matrix.os }}-slack-${{ env.SLACK_VERSION }}
+        key: ${{ env.CI_VERSION }}-${{ matrix.os }}-slack-${{ env.SLACK_VERSION }}
 
     - name: Install Slack (Ubuntu)
       run: |
@@ -144,9 +147,8 @@ jobs:
       if: matrix.os == 'macOS'
     - name: Install Slack (Windows)
       run: |
-        .\slack-download-windows\slack.exe
-        while (!(Test-Path "$env:userprofile\Desktop\Slack.lnk")) { Start-Sleep 10 }
-        Stop-Process -Name slack -passthru| Wait-Process
+        cd slack-download-windows
+        Start-Process MsiExec.exe -ArgumentList "/i slack.msi /qr /norestart" -wait
       if: matrix.os == 'windows'
     - name: Lint with flake8
       run: |
@@ -160,7 +162,7 @@ jobs:
       if: matrix.os == 'ubuntu' || matrix.os == 'macOS'
     - name: Test run the script (Windows)
       run: |
-        python math-with-slack.py
+        python math-with-slack.py -a 'C:\Program Files\Slack\resources\app.asar'
       shell: bash
       if: matrix.os == 'windows'
     - name: Prepare Badge Creation
@@ -214,7 +216,7 @@ jobs:
       uses: pat-s/always-upload-cache@v2.1.3
       with:
         path: failed.txt
-        key: ${{ github.run_number }}-failed
+        key: ${{ env.CI_VERSION }}-${{ github.run_number }}-failed
       if: ${{ failure() }}
   
   summary:
@@ -226,7 +228,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: failed.txt
-        key: ${{ github.run_number }}-failed
+        key: ${{ env.CI_VERSION }}-${{ github.run_number }}-failed
     - name: Set CI Status
       if: steps.get_exit_code.outputs.cache-hit == 'true'
       run: |
