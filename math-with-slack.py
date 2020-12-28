@@ -25,6 +25,7 @@ from __future__ import print_function
 import argparse
 import json
 import os
+import platform
 import glob
 import shutil
 import struct
@@ -104,13 +105,24 @@ def _diagnose_permission(e, app_path):
 
 # Find path to app.asar
 
-def find_candidate_files(path_globs, filename):
+def find_candidate_app_files(path_globs, filename="app*.asar", min_file_size_kb=100):
     candidates = []
     for path_glob in path_globs:
         candidates += glob.glob(os.path.join(path_glob, filename))
-    candidates =[c for c in candidates if os.path.isfile(c)]
+    candidates =[c for c in candidates 
+        if os.path.isfile(c) and os.path.getsize(c) > min_file_size_kb * 1000]
     candidates = sorted(candidates, key=lambda c: os.path.getctime(c), reverse=True)
     return candidates
+
+
+def filter_candidates_app_files_by_arch(search_paths):
+    machine = platform.machine()
+    if machine == "x86_64":
+        suffix = "-x64"
+    else:
+        suffix = "-arm64"
+    return [path for path in search_paths 
+        if os.path.splitext(os.path.basename(path))[0].endswith(suffix)]
 
 
 def display_choose_from_menu(candidates, header="", prompt=""):
@@ -140,20 +152,22 @@ else:
     path_lookups = {
         'darwin': ['/Applications/Slack.app/Contents/Resources/'],
         'linux': [
-            '/usr/lib/slack/resources/', 
+            '/usr/lib/slack/resources/',
             '/usr/local/lib/slack/resources/',
             '/opt/slack/resources/',
-            '/mnt/c/Users/*/AppData/Local/slack/*/resources/'
+            '/mnt/c/Users/*/AppData/Local/slack/*/resources/',
         ],
         'win32': [
             'c:\\Users\\*\\AppData\\Local\\slack\\*\\resources\\'
         ]
     }
-    platform = sys.platform
-    if platform.startswith('linux'):
-        platform = 'linux'
-    search_paths = path_lookups[platform]
-    candidate_app_asars = find_candidate_files(search_paths, filename='app.asar')
+    _platform = sys.platform
+    if _platform.startswith('linux'):
+        _platform = 'linux'
+    search_paths = path_lookups[_platform]
+    candidate_app_asars = find_candidate_app_files(search_paths)
+    if _platform == "darwin":
+        candidate_app_asars = filter_candidates_app_files_by_arch(candidate_app_asars)
     if len(candidate_app_asars) == 0:
         exprint(("Could not find Slack's app.asar file under {}. "
                  "Please manually provide path (see --help)").format(search_paths))
