@@ -118,11 +118,15 @@ def find_candidate_app_files(path_globs, filename="app*.asar", min_file_size_kb=
 def filter_candidates_app_files_by_arch(search_paths):
     machine = platform.machine()
     if machine == "x86_64":
-        suffix = "-x64"
+        suffix = "x64"
     else:
-        suffix = "-arm64"
-    return [path for path in search_paths 
-        if os.path.splitext(os.path.basename(path))[0].endswith(suffix)]
+        suffix = "arm64"
+
+    def cond(path):
+        basename = os.path.splitext(os.path.basename(path))[0]
+        return basename in ("app", "app-{}".format(suffix))
+
+    return list(filter(cond, search_paths))
 
 
 def display_choose_from_menu(candidates, header="", prompt=""):
