@@ -92,7 +92,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu]
-        python-version: [2.7, 3.6, 3.7, 3.8, 3.9, pypy2, pypy3]
+        python-version: [2.7, 3.6, 3.7, 3.8, 3.9, pypy-2.7, pypy-3.7]
         include:
           - os: macOS
             python-version: 2.7
@@ -147,7 +147,8 @@ jobs:
       if: matrix.os == 'macOS'
     - name: Install Slack (Windows)
       run: |
-        Start-Process MsiExec.exe -ArgumentList "/i .\slack-download-windows\slack.msi /qr /norestart" -wait
+        cd slack-download-windows
+        Start-Process MsiExec.exe -ArgumentList "/i slack.msi /qr /norestart" -wait
       if: matrix.os == 'windows'
     - name: Lint with flake8
       run: |
@@ -173,6 +174,7 @@ jobs:
         fi
         echo "BADGE_LOGO=${BADGE_LOGO}" >> $GITHUB_ENV
       shell: bash
+      if: ${{ always() && github.event_name != 'pull_request' }}
     - name: Create Success Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
