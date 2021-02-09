@@ -201,6 +201,12 @@ python math-with-slack.py --app-file=/My_Apps/Slack.app/Contents/Resources/app.a
 python math-with-slack.py --app-file=c:/Users/yourusername/AppData/Local/slack/app-4.7.0/resources/app.asar
 ```
 
+### Double underscore converts to italic
+
+If you are having problems that writing code like `$a_k b_k$` converts `_k b_`
+to italic font in the Slack-editor, go to ***Preferences → Advanced*** and
+check **Format messages with markup**. This should solve the problem.
+
 
 ## How do I get my math rendered?
 
