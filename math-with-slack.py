@@ -98,7 +98,13 @@ def _diagnose_permission(e, app_path):
         app_path_parts = os.path.split(os.sep)
         if "snap" in app_path_parts:
             err_msg = ("Possibile fix:\n"
-                       "\tSeems like you have a Snap install that this script might not support."
+                       "\tSeems like you have a Snap install that this script might not support. "
+                       "Please check README for more details.")
+    elif sys.platform.startswith("darwin"):
+        if isinstance(e, PermissionError):
+            err_msg = ("Possibile fix:\n"
+                       "\tSeems like you are using MacOS. Perhaps your Slack is installed through App Store?\n"
+                       "\tIf that's the case, you will need to use `sudo` to give the script enough permissions. "
                        "Please check README for more details.")
     return err_msg
 
@@ -193,6 +199,18 @@ with open(app_path, mode='rb') as check_app_fp:
     (header_data_size, json_binary_size) = struct.unpack('<II', check_app_fp.read(8))
     assert header_data_size == 4
     json_binary = check_app_fp.read(json_binary_size)
+
+# Do round trip write back to test if the file is writable...
+with open(app_path, mode='rb') as check_app_fp:
+    app_content_bk = check_app_fp.read()
+try:
+    with open(app_path, mode='wb') as check_app_fp_w:
+        check_app_fp_w.write(app_content_bk)
+except Exception as e:
+    print(e)
+    diagnosis = _diagnose_permission(e, app_path)
+    exprint('Cannot inject code to {}. Make sure the script has write permissions. {}'.format(app_path, diagnosis))
+
 
 (json_data_size, json_string_size) = struct.unpack('<II', json_binary[:8])
 assert json_binary_size == json_data_size + 4
