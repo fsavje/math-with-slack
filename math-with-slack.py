@@ -25,6 +25,7 @@ from __future__ import print_function
 import argparse
 import json
 import os
+import errno
 import platform
 import glob
 import shutil
@@ -101,7 +102,7 @@ def _diagnose_permission(e, app_path):
                        "\tSeems like you have a Snap install that this script might not support. "
                        "Please check README for more details.")
     elif sys.platform.startswith("darwin"):
-        if isinstance(e, PermissionError):
+        if isinstance(e, IOError) or isinstance(e, OSError) and (e.errno == errno.EPERM or e.errno == errno.EACCES):
             err_msg = ("Possibile fix:\n"
                        "\tSeems like you are using MacOS. Perhaps your Slack is installed through App Store?\n"
                        "\tIf that's the case, you will need to use `sudo` to give the script enough permissions. "
