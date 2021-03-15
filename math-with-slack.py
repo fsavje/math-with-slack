@@ -51,7 +51,7 @@ import tempfile
 
 # Math with Slack version
 
-mws_version = '0.4.1.2'
+mws_version = '0.4.1.3'
 
 
 # Parse command line options
