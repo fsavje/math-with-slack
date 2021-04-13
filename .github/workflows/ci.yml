@@ -62,7 +62,7 @@ jobs:
       run: |
         export SLACK_DOWNLOAD_URL=$(python .github/workflows/download_slack.py --get-download-url ${{ matrix.os }})
         echo "SLACK_DOWNLOAD_URL=${SLACK_DOWNLOAD_URL}" >> $GITHUB_ENV
-        mkdir slack-download-${{ matrix.os }}
+        mkdir -p slack-download-${{ matrix.os }}
       shell: bash
 
     - name: Download Slack Ubuntu
