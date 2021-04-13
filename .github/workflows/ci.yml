@@ -62,7 +62,7 @@ jobs:
       run: |
         export SLACK_DOWNLOAD_URL=$(python .github/workflows/download_slack.py --get-download-url ${{ matrix.os }})
         echo "SLACK_DOWNLOAD_URL=${SLACK_DOWNLOAD_URL}" >> $GITHUB_ENV
-        mkdir slack-download-${{ matrix.os }}
+        mkdir -p slack-download-${{ matrix.os }}
       shell: bash
 
     - name: Download Slack Ubuntu
@@ -163,7 +163,7 @@ jobs:
       if: matrix.os == 'ubuntu' || matrix.os == 'macOS'
     - name: Test run the script (Windows)
       run: |
-        python math-with-slack.py -a 'C:\Program Files\Slack\resources\app.asar'
+        python math-with-slack.py -a "${LOCALAPPDATA}\slack\app-${{ env.SLACK_VERSION }}\resources\app.asar"
       shell: bash
       if: matrix.os == 'windows'
     - name: Prepare Badge Creation
