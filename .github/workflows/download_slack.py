@@ -16,7 +16,7 @@ args = parser.parse_args()
 
 def get_url(platform):
 	lookup = {
-		"windows": "https://slack.com/ssb/download-win64-msi",
+		"windows": "https://slack.com/ssb/download-win64",
 		"macOS": "https://slack.com/ssb/download-osx",
 	}
 	if platform in lookup:
