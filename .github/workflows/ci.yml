@@ -143,7 +143,7 @@ jobs:
     - name: Install Slack (MacOS)
       run: |
         hdiutil attach slack-download-macOS/slack.dmg
-        sudo cp -rf /Volumes/Slack.app/Slack.app /Applications
+        sudo cp -rf /Volumes/Slack/Slack.app /Applications
       if: matrix.os == 'macOS'
     - name: Install Slack (Windows)
       run: |
