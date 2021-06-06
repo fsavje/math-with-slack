@@ -64,7 +64,9 @@ parser.add_argument('--mathjax-url',
                     default='https://registry.npmjs.org/mathjax/-/mathjax-3.1.0.tgz')
 parser.add_argument('--mathjax-tex-options', 
                     type=str,
-                    help='Path to file with TeX input processor options (See http://docs.mathjax.org/en/latest/options/input/tex.html).', 
+                    help='Path to file with TeX input processor options, '
+                         'or an inline string to the TeX input processor options. '
+                         'See http://docs.mathjax.org/en/latest/options/input/tex.html for the options format.', 
                     default='default')
 parser.add_argument('-u', '--uninstall', action='store_true', help='Removes injected MathJax code.')
 parser.add_argument('--version', action='version', version='%(prog)s ' + mws_version)
@@ -351,13 +353,18 @@ document.addEventListener('DOMContentLoaded', function() {
 ''').encode('utf-8')
 
 if args.mathjax_tex_options == "default": 
-    args.mathjax_tex_options = """{
+    mathjax_tex_options = """{
       packages: {'[+]': ['noerrors', 'noundefined']},
       inlineMath: [['$', '$']],
       displayMath: [['$$', '$$']],
     }"""
+elif os.path.isfile(args.mathjax_tex_options):
+    with open(args.mathjax_tex_options, "r") as f:
+        mathjax_tex_options = f.read()
+else:
+    mathjax_tex_options = args.mathjax_tex_options
 inject_code = inject_code.replace(b"$MATHJAX_TEX_OPTIONS$", 
-    args.mathjax_tex_options.encode('utf-8'))
+    mathjax_tex_options.encode("utf-8"))
 
 # Make backup
 
