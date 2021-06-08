@@ -275,7 +275,30 @@ document.addEventListener('DOMContentLoaded', function() {
         skipHtmlTags: [
             'script', 'noscript', 'style', 'textarea', 'pre',
             'code', 'annotation', 'annotation-xml'
-        ]
+        ],
+        renderActions: {
+          addCopyText: [155,
+            (doc) => {
+                for (const math of doc.math) {
+                    MathJax.config.addCopyText(math, doc)
+                }
+            },
+            (math, doc) => MathJax.config.addCopyText(math, doc)
+          ]
+        }
+    },
+    addCopyText(math, doc) {
+        const adaptor = doc.adaptor;
+        // For some reason, if we don't use this attribute hack the mjx-copytext
+        // will be injected twice.
+        // TODO: investigate why addCopyText is called twice.
+        if(!adaptor.hasAttribute(math.typesetRoot, "injected_copyable_text")) {
+            const text = adaptor.node('mjx-copytext', {'aria-hidden': true}, [
+              adaptor.text(math.start.delim + math.math + math.end.delim)
+            ]);
+            adaptor.append(math.typesetRoot, text);
+            adaptor.setAttribute(math.typesetRoot, "injected_copyable_text", "done");
+        }
     },
     loader: {
         paths: {mathjax: 'mathjax/es5'},
@@ -292,6 +315,15 @@ document.addEventListener('DOMContentLoaded', function() {
     startup: {
       ready: () => {
         MathJax = window.MathJax;
+
+        // Make the copyable text hidden 
+        MathJax._.output.svg_ts.SVG.commonStyles['mjx-copytext'] = {
+            display: 'inline-block',
+            position: 'absolute',
+            top: 0, left: 0, width: '1px', height: '1px',
+            opacity: 0,
+            overflow: 'hidden'
+        };
         MathJax.startup.defaultReady();
 
         // Disable some menu option that will cause us to crash
