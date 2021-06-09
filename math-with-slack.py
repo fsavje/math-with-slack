@@ -278,11 +278,10 @@ document.addEventListener('DOMContentLoaded', function() {
         ],
         renderActions: {
           assistiveMml: [],
-          addCopyText: [156,
+          addCopyText: [155,
             (doc) => {
-                if (!doc.processed.isSet('addtext')) {
-                    for (const math of doc.math) MathJax.config.addCopyText(math, doc);
-                    doc.processed.set('addtext');
+                for (const math of doc.math) {
+                    MathJax.config.addCopyText(math, doc)
                 }
             },
             (math, doc) => MathJax.config.addCopyText(math, doc)
@@ -290,13 +289,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     },
     addCopyText(math, doc) {
-        if (math.state() < MathJax.STATE.ADDTEXT) {
-            const adaptor = doc.adaptor;
+        const adaptor = doc.adaptor;
+        // TODO: fix this duplication check properly according to 
+        // https://github.com/mathjax/MathJax/issues/2240#issuecomment-857258052
+        if(!adaptor.hasAttribute(math.typesetRoot, "injected_copyable_text")) {
             const text = adaptor.node('span', {'aria-hidden': true, 'class': 'mjx-copytext'}, [
               adaptor.text(math.start.delim + math.math + math.end.delim)
             ]);
             adaptor.append(math.typesetRoot, text);
-            math.state(MathJax.STATE.ADDTEXT);
+            adaptor.setAttribute(math.typesetRoot, "injected_copyable_text", "done");
         }
     },
     loader: {
@@ -315,15 +316,6 @@ document.addEventListener('DOMContentLoaded', function() {
       ready: () => {
         MathJax = window.MathJax;
 
-        // Add a new state bit to see if we have added text or not already
-        // See https://github.com/mathjax/MathJax/issues/2240#issuecomment-857270918
-        const {newState, STATE} = MathJax._.core.MathItem;
-        const {AbstractMathDocument} = MathJax._.core.MathDocument;
-        newState('ADDTEXT', 156);
-        AbstractMathDocument.ProcessBits.allocate('addtext');
-        MathJax.STATE = STATE;
-
-        // Invoke MathJax's default initialization
         MathJax.startup.defaultReady();
 
         // Disable some menu option that will cause us to crash
