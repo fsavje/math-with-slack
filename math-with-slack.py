@@ -277,10 +277,12 @@ document.addEventListener('DOMContentLoaded', function() {
             'code', 'annotation', 'annotation-xml'
         ],
         renderActions: {
-          addCopyText: [155,
+          assistiveMml: [],
+          addCopyText: [156,
             (doc) => {
-                for (const math of doc.math) {
-                    MathJax.config.addCopyText(math, doc)
+                if (!doc.processed.isSet('addtext')) {
+                    for (const math of doc.math) MathJax.config.addCopyText(math, doc);
+                    doc.processed.set('addtext');
                 }
             },
             (math, doc) => MathJax.config.addCopyText(math, doc)
@@ -288,16 +290,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     },
     addCopyText(math, doc) {
-        const adaptor = doc.adaptor;
-        // For some reason, if we don't use this attribute hack the mjx-copytext
-        // will be injected twice.
-        // TODO: investigate why addCopyText is called twice.
-        if(!adaptor.hasAttribute(math.typesetRoot, "injected_copyable_text")) {
-            const text = adaptor.node('mjx-copytext', {'aria-hidden': true}, [
+        if (math.state() < MathJax.STATE.ADDTEXT) {
+            const adaptor = doc.adaptor;
+            const text = adaptor.node('span', {'aria-hidden': true, 'class': 'mjx-copytext'}, [
               adaptor.text(math.start.delim + math.math + math.end.delim)
             ]);
             adaptor.append(math.typesetRoot, text);
-            adaptor.setAttribute(math.typesetRoot, "injected_copyable_text", "done");
+            math.state(MathJax.STATE.ADDTEXT);
         }
     },
     loader: {
@@ -316,14 +315,15 @@ document.addEventListener('DOMContentLoaded', function() {
       ready: () => {
         MathJax = window.MathJax;
 
-        // Make the copyable text hidden 
-        MathJax._.output.svg_ts.SVG.commonStyles['mjx-copytext'] = {
-            display: 'inline-block',
-            position: 'absolute',
-            top: 0, left: 0, width: '1px', height: '1px',
-            opacity: 0,
-            overflow: 'hidden'
-        };
+        // Add a new state bit to see if we have added text or not already
+        // See https://github.com/mathjax/MathJax/issues/2240#issuecomment-857270918
+        const {newState, STATE} = MathJax._.core.MathItem;
+        const {AbstractMathDocument} = MathJax._.core.MathDocument;
+        newState('ADDTEXT', 156);
+        AbstractMathDocument.ProcessBits.allocate('addtext');
+        MathJax.STATE = STATE;
+
+        // Invoke MathJax's default initialization
         MathJax.startup.defaultReady();
 
         // Disable some menu option that will cause us to crash
@@ -375,6 +375,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   .CtxtMenu_Info {
     z-index: 10000 !important;
+  }
+  .mjx-copytext {
+    font-size: 0;
   }
   `;
   document.body.appendChild(ctxMenustyle);
