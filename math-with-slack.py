@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         MathJax.startup.document.menu.menu.findID('Accessibility').disable();
 
         // Observer for when an element needs to be typeset
-        var entry_observer = new IntersectionObserver(
+        var intersection_observer = new IntersectionObserver(
           (entries, observer) => {
             var appearedEntries = entries.filter((entry) => entry.intersectionRatio > 0);
             if(appearedEntries.length) {
@@ -350,24 +350,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // observer for elements are first inserted into the DOM.
         // We delay elements that require typesetting to the intersection observer
-        function enque_typeset() {
-            var messages = document.querySelectorAll(
-            'span.c-message__body, span.c-message_kit__text, div.p-rich_text_block, span.c-message_attachment__text');
-            var to_typeset = [];
-            for (var i = 0; i < messages.length; i++) {
-                var msg = messages[i];
-                if(!msg.ready) {
-                    msg.ready = true;
-                    entry_observer.observe(msg);
-                }
-            }
+        function observe_dom_change(mutations) {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((addedNode) => {
+                    if(addedNode.nodeType != Node.TEXT_NODE) {
+                        const messages = addedNode.querySelectorAll(
+                        'span.c-message__body, span.c-message_kit__text, div.p-rich_text_block, span.c-message_attachment__text');
+                        messages.forEach((msg) => {
+                            if(!msg.ready) {
+                                msg.ready = true;
+                                intersection_observer.observe(msg);
+                            }
+                        });
+                    }
+                });
+            })
+            mutations.forEach((mutation) => {
+                MathJax.typesetClear(mutation.removedNodes);
+            })
         }
-        observer = new MutationObserver(enque_typeset);
-        observer.observe(document.body, {
+        var mutation_observer = new MutationObserver(observe_dom_change);
+        mutation_observer.observe(document.body, {
             childList: true,
             subtree: true
         });
-        enque_typeset();
+        observe_dom_change();
       }
     },
   };
