@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // TODO: fix this duplication check properly according to 
         // https://github.com/mathjax/MathJax/issues/2240#issuecomment-857258052
         if(!adaptor.hasAttribute(math.typesetRoot, "injected_copyable_text")) {
-            const text = adaptor.node('span', {'aria-hidden': true, 'class': 'mjx-copytext'}, [
+            const text = adaptor.node('mjx-copytext', {'aria-hidden': true}, [
               adaptor.text(math.start.delim + math.math + math.end.delim)
             ]);
             adaptor.append(math.typesetRoot, text);
@@ -316,6 +316,14 @@ document.addEventListener('DOMContentLoaded', function() {
       ready: () => {
         MathJax = window.MathJax;
 
+        // Make the copyable text hidden 
+        MathJax._.output.svg_ts.SVG.commonStyles['mjx-copytext'] = {
+            display: 'inline-block',
+            position: 'absolute',
+            top: 0, left: 0, width: '1px', height: '1px',
+            opacity: 0,
+            overflow: 'hidden'
+        };
         MathJax.startup.defaultReady();
 
         // Disable some menu option that will cause us to crash
@@ -367,9 +375,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   .CtxtMenu_Info {
     z-index: 10000 !important;
-  }
-  .mjx-copytext {
-    font-size: 0;
   }
   `;
   document.body.appendChild(ctxMenustyle);
