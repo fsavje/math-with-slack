@@ -300,6 +300,13 @@ document.addEventListener('DOMContentLoaded', function() {
                   adaptor.text(math.start.delim + math.math + math.end.delim)
                 ]);
                 adaptor.append(math.typesetRoot, text);
+                // Insert thin space(s) if math is at begin or end of text
+                if (math.start.n == 0) {
+                    adaptor.insert(adaptor.text('\u200A'), adaptor.firstChild(math.typesetRoot));
+                }
+                if (math.end.n == math.end.node.length) {
+                    adaptor.append(math.typesetRoot, adaptor.text('\u200A'));
+                }
             }
             math.state(MathJax.STATE.ADDTEXT);
         }
