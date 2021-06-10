@@ -1,6 +1,8 @@
 # math-with-slack 0.4.2
 
   * Added support to select and copy-paste rendered TeX. Currently selection highlight is not available, but copying works. 
+  * The injected code now garbage collects zombie formulas
+  * Let `--mathjax-tex-options` takes in a file path to allow easy customization.
 
 # math-with-slack 0.4.1
 
