@@ -1,3 +1,7 @@
+# math-with-slack 0.4.2
+
+  * Added support to select and copy-paste rendered TeX. Currently selection highlight is not available, but copying works. 
+
 # math-with-slack 0.4.1
 
   * Changed default MathJax to v3.1.0
