@@ -294,11 +294,13 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     addCopyText(math, doc) {
         if (math.state() < MathJax.STATE.ADDTEXT) {
-            const adaptor = doc.adaptor;
-            const text = adaptor.node('span', {'aria-hidden': true, 'class': 'mathjax_ignore mjx-copytext'}, [
-              adaptor.text(math.start.delim + math.math + math.end.delim)
-            ]);
-            adaptor.append(math.typesetRoot, text);
+            if (!math.isEscaped) {
+                const adaptor = doc.adaptor;
+                const text = adaptor.node('span', {'aria-hidden': true, 'class': 'mathjax_ignore mjx-copytext'}, [
+                  adaptor.text(math.start.delim + math.math + math.end.delim)
+                ]);
+                adaptor.append(math.typesetRoot, text);
+            }
             math.state(MathJax.STATE.ADDTEXT);
         }
     },
