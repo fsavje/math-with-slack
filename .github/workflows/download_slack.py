@@ -24,7 +24,7 @@ def get_url(platform):
 	# Handle Ubuntu
 	scraper = autoscraper.AutoScraper()
 	return scraper.build("https://slack.com/downloads/instructions/fedora", 
-		[re.compile(r"https://downloads\.slack-edge\.com/linux_releases/slack-.*")])[0]
+		[re.compile(r"https://downloads\.slack-edge\.com/releases/linux/.*")])[0]
 
 
 def get_version(platform):
