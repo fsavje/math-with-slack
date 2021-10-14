@@ -548,7 +548,10 @@ def get_reporthook():
         sys.stdout.flush()
     return reporthook
 
-mathjax_tar_name, headers = urllib_request.urlretrieve(args.mathjax_url,
+if os.path.isfile(args.mathjax_url):
+    mathjax_tar_name = args.mathjax_url
+else:
+    mathjax_tar_name, headers = urllib_request.urlretrieve(args.mathjax_url, 
         [], get_reporthook())
 mathjax_tmp_dir = tempfile.mkdtemp()
 mathjax_tar = tarfile.open(mathjax_tar_name)
