@@ -60,7 +60,7 @@ mws_version = '0.4.2.0'
 parser = argparse.ArgumentParser(prog='math-with-slack', description='Inject Slack with MathJax.')
 parser.add_argument('-a', '--app-file', help='Path to Slack\'s \'app.asar\' file.')
 parser.add_argument('--mathjax-url', 
-                    help='Url to download mathjax release.', 
+                    help='Either a remote URL to download a MathJax release or a local path to a pre-downloaded MathJax release.', 
                     default='https://registry.npmjs.org/mathjax/-/mathjax-3.1.0.tgz')
 parser.add_argument('--mathjax-tex-options', 
                     type=str,
