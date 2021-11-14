@@ -24,6 +24,7 @@ from __future__ import print_function
 import argparse
 import json
 import os
+import stat
 import errno
 import platform
 import glob
@@ -53,8 +54,6 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 import tarfile
 import tempfile
-
-import asar
 
 # Math with Slack version
 
@@ -622,7 +621,7 @@ def get_files_need_modification(app_path):
 def is_previously_modified(app_path):
   with AsarExtractor.open(app_path) as asar_extractor:
     asar_header = asar_extractor.files
-  return 'MWSINJECT' in asar_header
+  return 'MWSINJECT' in asar_header["files"]
 
 
 def extract_asar(tmp_dir, app_path, app_backup_path):
@@ -630,7 +629,7 @@ def extract_asar(tmp_dir, app_path, app_backup_path):
   asar_extractor = AsarExtractor.open(app_backup_path)
   asar_extractor.filename = app_path  # Use the non-backup asar name
   asar_extractor.extract(asar_extracted_dir)
-  assert 'MWSINJECT' not in asar_extractor.files
+  assert 'MWSINJECT' not in asar_extractor.files["files"]
   return asar_extractor, asar_extracted_dir
 
 
@@ -939,6 +938,9 @@ def main():
   mathjax_src = download_mathjax(args.mathjax_url)
   inject_code = get_injected_code(mathjax_src, args.mathjax_tex_options)
 
+  with open(os.path.join(asar_extracted_dir, "MWSINJECT"), "w") as f:
+    pass
+
   with open(os.path.join(asar_extracted_dir, "dist/preload.bundle.js"),
             "ab") as f:
     f.write(inject_code)
@@ -965,3 +967,4 @@ if __name__ == '__main__':
 # https://github.com/electron/asar
 # https://github.com/electron-archive/node-chromium-pickle
 # https://github.com/leovoel/BeautifulDiscord/tree/master/beautifuldiscord
+# https://github.com/Photonios/pyasar
