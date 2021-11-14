@@ -57,7 +57,7 @@ import tempfile
 
 # Math with Slack version
 
-mws_version = '0.4.22.0'
+mws_version = '0.4.3.0'
 
 # Misc functions
 
