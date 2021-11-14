@@ -181,8 +181,9 @@ def remove_backup(orig_file):
       print(ex)
       diagnosis = _diagnose_permission(ex, backup_path)
       exprint(
-          "Cannot remove old backup at {}. Make sure the script has write permissions."
-          .format(backup_path) + diagnosis)
+          ("Cannot remove old backup at {}. "
+           "Make sure the script has write permissions.").format(backup_path) +
+          diagnosis)
 
 
 # end Misc functions
@@ -870,7 +871,7 @@ def get_injected_code(mathjax_src, mathjax_tex_options):
 def macos_get_plists(app_path):
   plist_paths = [
       "../../Info.plist",
-      "../../FrameWorks/Electron Framework.framework/Resources/Info.plist",
+      # "../../FrameWorks/Electron Framework.framework/Resources/Info.plist",
   ]
   return [os.path.normpath(os.path.join(app_path, p)) for p in plist_paths]
 
@@ -895,7 +896,7 @@ def macos_update_plists(app_path, new_asar_hash):
       plist["ElectronAsarIntegrity"][os.path.relpath(
           app_path, os.path.join(app_path, "../.."))]["hash"] = new_asar_hash
     except KeyError:
-      exprint("It appears that you likely have a broken Slack install."
+      exprint("It appears that you likely have a broken Slack install. "
               "Please re-install Slack.")
     with open(plist_path, "wb") as f:
       write_plist(plist, f)
