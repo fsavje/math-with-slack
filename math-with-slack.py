@@ -118,17 +118,19 @@ def _diagnose_permission(ex, app_path):
   return err_msg
 
 
-def round_trip_check_permission(file_path):
-  """Does round trip write back to test if the file is writable."""
-  with open(file_path, mode='rb') as check_app_fp:
-    app_content_bk = check_app_fp.read()
-
+def check_permission(file_path, write=False):
+  """Test if the file is readable and/or writable."""
   try:
-    with open(file_path, mode='wb') as check_app_fp_w:
-      check_app_fp_w.write(app_content_bk)
-  except Exception as e:
-    print(e)
-    diagnosis = _diagnose_permission(e, file_path)
+    with open(file_path, mode='rb') as check_app_fp:
+      app_content_bk = check_app_fp.read()
+
+    if write:
+      with open(file_path, mode='wb') as check_app_fp_w:
+        check_app_fp_w.write(app_content_bk)
+
+  except Exception as ex:
+    print(ex)
+    diagnosis = _diagnose_permission(ex, file_path)
     exprint(("Cannot modify {}. "
              "Make sure the script has write permissions. {}").format(
                  file_path, diagnosis))
@@ -612,9 +614,9 @@ def resolve_app_path(app_path):
   return app_path
 
 
-def get_files_need_modification(app_path):
+def get_files_need_modification(app_path, slack_version):
   ret = [app_path]
-  if get_platform() == "darwin":
+  if get_platform() == "darwin" and slack_version < LooseVersion("4.22"):
     ret += macos_get_plists(app_path)
   return ret
 
@@ -625,18 +627,21 @@ def is_previously_modified(app_path):
   return 'MWSINJECT' in asar_header["files"]
 
 
-def extract_asar(tmp_dir, app_path, app_backup_path):
+def extract_asar(tmp_dir, app_path):
   asar_extracted_dir = os.path.join(tmp_dir, "app.asar.unpacked")
-  asar_extractor = AsarExtractor.open(app_backup_path)
+  asar_extractor = AsarExtractor.open(app_path)
   asar_extractor.filename = app_path  # Use the non-backup asar name
   asar_extractor.extract(asar_extracted_dir)
-  assert 'MWSINJECT' not in asar_extractor.files["files"]
   return asar_extractor, asar_extracted_dir
 
 
-def check_slack_version(asar_extracted_dir):
+def read_slack_version(asar_extracted_dir):
   with open(os.path.join(asar_extracted_dir, "package.json"), "r") as f:
-    slack_version = LooseVersion(json.load(f)["version"])
+    return LooseVersion(json.load(f)["version"])
+
+
+def check_slack_version(asar_extracted_dir):
+  slack_version = read_slack_version(asar_extracted_dir)
   if slack_version <= LooseVersion('4.4'):
     exprint("Unsupported Slack Version {}.".format(slack_version))
 
@@ -911,12 +916,16 @@ def main():
   app_path = resolve_app_path(args.app_file)
   print('Using Slack installation at: ' + app_path)
 
-  files_to_modify = get_files_need_modification(app_path)
+  check_permission(app_path, write=False)
 
   tmp_dir = tempfile.mkdtemp()
+  _, asar_extracted_dir = extract_asar(tmp_dir, app_path)
+  slack_version = read_slack_version(asar_extracted_dir)
+  shutil.rmtree(asar_extracted_dir)
+  files_to_modify = get_files_need_modification(app_path, slack_version)
 
   for file in files_to_modify:
-    round_trip_check_permission(file)
+    check_permission(file, write=True)
 
   if is_previously_modified(app_path):
     for file in files_to_modify:
@@ -932,9 +941,9 @@ def main():
   for file in files_to_modify:
     make_backup(file)
 
-  app_backup_path = get_backup_path(app_path)
-  asar_extractor, asar_extracted_dir = extract_asar(tmp_dir, app_path,
-                                                    app_backup_path)
+  asar_extractor, asar_extracted_dir = extract_asar(tmp_dir, app_path)
+  assert 'MWSINJECT' not in asar_extractor.files["files"]
+
   check_slack_version(asar_extracted_dir)
   mathjax_src = download_mathjax(args.mathjax_url)
   inject_code = get_injected_code(mathjax_src, args.mathjax_tex_options)
@@ -950,7 +959,7 @@ def main():
   new_asar_hash = asar_packer.pack(asar_extracted_dir, app_path,
                                    asar_extractor.get_unpackeds())
 
-  if platform == "darwin":
+  if platform == "darwin" and slack_version >= LooseVersion("4.22"):
     macos_update_plists(app_path, new_asar_hash)
 
   shutil.rmtree(tmp_dir)
