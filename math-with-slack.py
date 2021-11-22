@@ -193,11 +193,14 @@ def remove_backup(orig_file):
 def macos_codesign_setup(cert, workdir):
   """Setup a certificate in MacOS's keychain."""
 
-  out = subprocess.call([
-      "security", "find-certificate", "-Z", "-p", "-c", cert,
-      "/Library/Keychains/System.keychain"
-  ],
-                        stdout=subprocess.DEVNULL)
+  out = subprocess.call(
+      [
+          "security", "find-certificate", "-Z", "-p", "-c", cert,
+          "/Library/Keychains/System.keychain"
+      ],
+      stdout=subprocess.DEVNULL,
+      stderr=subprocess.DEVNULL,
+  )
   if out == 0:
     print("Using existing certificate {}".format(cert))
     return
@@ -229,6 +232,7 @@ def macos_codesign_setup(cert, workdir):
           "codesign_reqext", "-batch", "-out", cert_path, "-keyout", key_path
       ],
       stdout=subprocess.DEVNULL,
+      stderr=subprocess.DEVNULL,
   )
 
   subprocess.check_call(
@@ -241,14 +245,13 @@ def macos_codesign_setup(cert, workdir):
 
   subprocess.check_call(
       [
-          "sudo", "security", "import", cert_path, "-A", "-k",
+          "sudo", "security", "import", key_path, "-A", "-k",
           "/Library/Keychains/System.keychain"
       ],
       stdout=subprocess.DEVNULL,
   )
 
-  subprocess.check_call(["sudo", "pkill", "-f"
-                         "/usr/libexec/taskgated"],
+  subprocess.check_call(["sudo", "pkill", "-f", "/usr/libexec/taskgated"],
                         stdout=subprocess.DEVNULL)
 
   print("Geneterated new certificate {}".format(cert))
