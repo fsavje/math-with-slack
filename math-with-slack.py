@@ -33,11 +33,13 @@ import shutil
 import sys
 import subprocess
 import time
+import textwrap
 import logging
 import math
 import struct
 import functools
 import hashlib
+
 from distutils.version import LooseVersion
 
 try:
@@ -186,6 +188,90 @@ def remove_backup(orig_file):
           ("Cannot remove old backup at {}. "
            "Make sure the script has write permissions.").format(backup_path) +
           diagnosis)
+
+
+def macos_codesign_setup(cert, workdir):
+  """Setup a certificate in MacOS's keychain."""
+
+  out = subprocess.call(
+      [
+          "security", "find-certificate", "-Z", "-p", "-c", cert,
+          "/Library/Keychains/System.keychain"
+      ],
+      stdout=subprocess.DEVNULL,
+      stderr=subprocess.DEVNULL,
+  )
+  if out == 0:
+    print("Using existing certificate {}".format(cert))
+    return
+  cert_tmpl_path = os.path.join(workdir, "cert.tmpl")
+
+  with open(cert_tmpl_path, "w+") as f:
+    f.write(
+        textwrap.dedent("""\
+          [ req ]
+          default_bits       = 2048        # RSA key size
+          encrypt_key        = no          # Protect private key
+          default_md         = sha512      # MD to use
+          prompt             = no          # Prompt for DN
+          distinguished_name = codesign_dn # DN template
+          [ codesign_dn ]
+          commonName         = "{}"
+          [ codesign_reqext ]
+          keyUsage           = critical,digitalSignature
+          extendedKeyUsage   = critical,codeSigning""".format(cert)))
+
+  print("Generating and installing {} certificate".format(cert))
+  cert_path = os.path.join(workdir, "{}.cer".format(cert))
+  key_path = os.path.join(workdir, "{}.key".format(cert))
+
+  subprocess.check_call(
+      [
+          "openssl", "req", "-new", "-newkey", "rsa:2048", "-x509", "-days",
+          "3650", "-nodes", "-config", cert_tmpl_path, "-extensions",
+          "codesign_reqext", "-batch", "-out", cert_path, "-keyout", key_path
+      ],
+      stdout=subprocess.DEVNULL,
+      stderr=subprocess.DEVNULL,
+  )
+
+  subprocess.check_call(
+      [
+          "sudo", "security", "add-trusted-cert", "-d", "-r", "trustRoot", "-p",
+          "codeSign", "-k", "/Library/Keychains/System.keychain", cert_path
+      ],
+      stdout=subprocess.DEVNULL,
+  )
+
+  subprocess.check_call(
+      [
+          "sudo", "security", "import", key_path, "-A", "-k",
+          "/Library/Keychains/System.keychain"
+      ],
+      stdout=subprocess.DEVNULL,
+  )
+
+  subprocess.check_call(["sudo", "pkill", "-f", "/usr/libexec/taskgated"],
+                        stdout=subprocess.DEVNULL)
+
+  print("Geneterated new certificate {}".format(cert))
+
+
+def macos_codesign_app(cert, workdir, app_path):
+  slack_app_path = os.path.normpath(os.path.join(app_path, "../../../"))
+  entitlements_path = os.path.join(workdir, "slack-entitlements.xml")
+  subprocess.check_call(
+      ["codesign", "-d", "--entitlements", entitlements_path, slack_app_path],
+      stdout=subprocess.DEVNULL,
+      stderr=subprocess.DEVNULL,
+  )
+  subprocess.check_call(
+      [
+          "codesign", "--entitlements", entitlements_path, "--force", "--sign",
+          cert, slack_app_path
+      ],
+      stdout=subprocess.DEVNULL,
+  )
 
 
 # end Misc functions
@@ -515,6 +601,9 @@ def create_cmd_parser():
             'See http://docs.mathjax.org/en/latest/options/input/tex.html '
             'for the options format.'),
       default='default')
+  parser.add_argument("--macos-codesign",
+                      action="store_true",
+                      help="Opt-in to perform code signing on MacOS.")
   parser.add_argument('-u',
                       '--uninstall',
                       action='store_true',
@@ -907,6 +996,29 @@ def macos_update_plists(app_path, new_asar_hash):
       write_plist(plist, f)
 
 
+def macos_do_or_warn_codesign(do_codesign, workdir, app_path):
+  codesign_msg = (
+      "Math-with-slack is likely functional; "
+      "however, you might experience log-offs if you quit Slack. "
+      "See github.com/thisiscam/math-with-slack/issues/30 for more info.")
+  if do_codesign:
+    cert = "math-with-slack-codesign"
+    try:
+      macos_codesign_setup(cert, workdir)
+      macos_codesign_app(cert, workdir, app_path)
+    except:
+      print("Warning: code signing failed. " + codesign_msg)
+  else:
+    print("Caveat!!!")
+    print("You are on MacOS but have not enabled code signing. " +
+          codesign_msg + "\n" + "If you don't understand the above, "
+          "you should stop reading and use the script as-is, "
+          "or uninstall the script with `--uninstall`." + "\n" +
+          "If you know what this is about and know what you are doing: "
+          "you may re-run this script with `--macos-codesign` "
+          "to enable code signing. ")
+
+
 def main():
   parser = create_cmd_parser()
   args = parser.parse_args()
@@ -961,6 +1073,7 @@ def main():
 
   if platform == "darwin" and slack_version >= LooseVersion("4.22"):
     macos_update_plists(app_path, new_asar_hash)
+    macos_do_or_warn_codesign(args.macos_codesign, tmp_dir, app_path)
 
   shutil.rmtree(tmp_dir)
   print('Install successful. Please restart Slack.')
