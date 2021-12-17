@@ -265,6 +265,18 @@ def macos_codesign_app(cert, workdir, app_path):
       stdout=subprocess.DEVNULL,
       stderr=subprocess.DEVNULL,
   )
+  with open(entitlements_path, "r+") as f:
+    is_der_file = "[Dict]" in f.readline()
+    if is_der_file:
+      # `codesign` produced a DER file, so scratch that and regenerate with `--xml`.
+      f.truncate(0)
+  if is_der_file:
+    subprocess.check_call(
+        ["codesign", "-d", "--entitlements", entitlements_path, "--xml", slack_app_path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
   subprocess.check_call(
       [
           "codesign", "--entitlements", entitlements_path, "--force", "--sign",
