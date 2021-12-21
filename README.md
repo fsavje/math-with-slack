@@ -123,7 +123,7 @@ If multiple versions of Slack are found on your computer, you will be asked to s
    
    ```
    python math-with-slack.py
-   Several verisons of Slack were installed.
+   Several versions of Slack were installed.
     0: /mnt/c/Users/***/AppData/Local/slack/app-4.9.0/resources/app.asar (default)
     1: /mnt/c/Users/***/AppData/Local/slack/app-4.8.0/resources/app.asar
    Please select a version (#/Stop): 1
