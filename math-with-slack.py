@@ -272,7 +272,10 @@ def macos_codesign_app(cert, workdir, app_path):
       f.truncate(0)
   if is_der_file:
     subprocess.check_call(
-        ["codesign", "-d", "--entitlements", entitlements_path, "--xml", slack_app_path],
+        [
+            "codesign", "-d", "--entitlements", entitlements_path, "--xml",
+            slack_app_path
+        ],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
@@ -717,7 +720,7 @@ def resolve_app_path(app_path):
 
 def get_files_need_modification(app_path, slack_version):
   ret = [app_path]
-  if get_platform() == "darwin" and slack_version < LooseVersion("4.22"):
+  if get_platform() == "darwin" and slack_version >= LooseVersion("4.22"):
     ret += macos_get_plists(app_path)
   return ret
 
