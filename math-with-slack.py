@@ -120,6 +120,20 @@ def _diagnose_permission(ex, app_path):
   return err_msg
 
 
+def _macos_get_slack_app_root_path(app_path):
+  return os.path.normpath(os.path.join(app_path, "../../../"))
+
+
+def check_app_ready(app_path):
+  plat = get_platform()
+  if plat == "darwin":
+    output = subprocess.check_output(
+        ["xattr", _macos_get_slack_app_root_path(app_path)])
+    if b'com.apple.appstore.metadata' in output:
+      exprint("Cannot use this script on Slack downloaded from App Store."
+              " Please re-install from Slack website instead.")
+
+
 def check_permission(file_path, write=False):
   """Test if the file is readable and/or writable."""
   try:
@@ -258,7 +272,7 @@ def macos_codesign_setup(cert, workdir):
 
 
 def macos_codesign_app(cert, workdir, app_path):
-  slack_app_path = os.path.normpath(os.path.join(app_path, "../../../"))
+  slack_app_path = _macos_get_slack_app_root_path(app_path)
   entitlements_path = os.path.join(workdir, "slack-entitlements.xml")
   subprocess.check_call(
       ["codesign", "-d", "--entitlements", entitlements_path, slack_app_path],
@@ -1043,6 +1057,7 @@ def main():
   app_path = resolve_app_path(args.app_file)
   print('Using Slack installation at: ' + app_path)
 
+  check_app_ready(app_path)
   check_permission(app_path, write=False)
 
   tmp_dir = tempfile.mkdtemp()
