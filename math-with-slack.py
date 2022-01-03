@@ -296,8 +296,8 @@ def macos_codesign_app(cert, workdir, app_path):
 
   subprocess.check_call(
       [
-          "codesign", "--entitlements", entitlements_path, "--force", "--sign",
-          cert, slack_app_path
+          "codesign", "--entitlements", entitlements_path, "--deep", "--force",
+          "--sign", cert, slack_app_path
       ],
       stdout=subprocess.DEVNULL,
   )
