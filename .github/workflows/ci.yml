@@ -92,7 +92,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu]
-        python-version: [2.7, 3.6, 3.7, 3.8, 3.9, pypy-2.7, pypy-3.7]
+        python-version: [3.6, 3.7, 3.8, 3.9, pypy-3.7]
         include:
           - os: macOS
             python-version: 2.7
