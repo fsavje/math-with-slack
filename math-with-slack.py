@@ -663,11 +663,13 @@ def _find_candidate_app_files(path_globs,
 
 
 def _filter_candidates_app_files_by_arch(search_paths):
-  machine = platform.machine()
-  if machine == "x86_64":
-    suffix = "x64"
-  else:
+  output = subprocess.check_output(
+    ["sysctl", "-n", "machdep.cpu.brand_string"])
+
+  if b'Apple' in output:
     suffix = "arm64"
+  else:
+    suffix = "x64"
 
   def cond(path):
     basename = os.path.splitext(os.path.basename(path))[0]
